@@ -6,6 +6,7 @@ ClassImp(GETBlobHeader)
    UInt_t GETBlobHeader::GetAsadMask()   { return (UInt_t) fAsadMask; }
    UInt_t GETBlobHeader::Get2pMode()     { return (UInt_t) f2pMode; }
    UInt_t GETBlobHeader::GetUNUSED()     { return (UInt_t) fUNUSED; }
+ULong64_t GETBlobHeader::GetFrameSkip()  { return 0; }
 ULong64_t GETBlobHeader::GetHeaderSkip() { return 0; }
 
 void GETBlobHeader::Clear() {

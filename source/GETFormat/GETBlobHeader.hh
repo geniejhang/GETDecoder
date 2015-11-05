@@ -11,6 +11,7 @@ class GETBlobHeader : public GETHeaderBase {
        UInt_t GetAsadMask();
        UInt_t Get2pMode();
        UInt_t GetUNUSED();
+    ULong64_t GetFrameSkip();
     ULong64_t GetHeaderSkip();
 
     void Clear();
