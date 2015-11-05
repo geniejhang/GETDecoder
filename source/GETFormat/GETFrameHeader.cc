@@ -42,7 +42,7 @@ UInt_t GETFrameHeader::GetLastCell(Int_t asadIdx) {
   return CorrectEndianness(tempLastCell, 2);
 }
 
-ULong64_t GETFrameHeader::GetFrameSkip()               { return GetFrameSize() - GETFRAMEHEADERSIZE; }
+ULong64_t GETFrameHeader::GetFrameSkip()               { return GetFrameSize() - GetHeaderSize(); }
    UInt_t GETFrameHeader::GetHeaderSkip()              { return GetHeaderSize() - GETFRAMEHEADERSIZE; }
 
 void GETFrameHeader::Clear() {
