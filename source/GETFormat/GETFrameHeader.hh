@@ -3,6 +3,8 @@
 
 #include "GETHeaderBase.hh"
 
+#define GETFRAMEHEADERSIZE (GETHEADERBASESIZE + 79)
+
 #include <bitset>
 
 using std::bitset;
@@ -22,9 +24,10 @@ class GETFrameHeader : public GETHeaderBase {
         UInt_t GetMultip(Int_t asadIdx);
         UInt_t GetWindowOut();
         UInt_t GetLastCell(Int_t asadIdx);
-       ULong_t GetFrameSkip();
+     ULong64_t GetFrameSkip();
         UInt_t GetHeaderSkip();
 
+    void Clear();
     void Read(ifstream &stream);
 
     void Print();

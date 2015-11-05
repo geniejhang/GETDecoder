@@ -9,4 +9,6 @@
 #pragma link C++ class GETFrameHeader+;
 #pragma link C++ class GETLayerHeader+;
 
+#pragma link C++ class GETFrame+;
+
 #endif

@@ -1,12 +1,19 @@
 #ifndef GETHEADERBASE
 #define GETHEADERBASE
 
+#define GETHEADERBASESIZE         8
+#define GETFRAMEBASICTYPE1      0x1
+#define GETFRAMEBASICTYPE2      0x2
+#define GETFRAMEMERGEDBYID   0xff01
+#define GETFRAMEMERGEDBYTIME 0xff02
+
 #include "Rtypes.h"
 
 #include <fstream>
 #include <iostream>
 #include <bitset>
 #include <cmath>
+#include <cstdio>
 
 using namespace std;
 
@@ -17,7 +24,7 @@ class GETHeaderBase {
        UInt_t GetDataSource();
        UInt_t GetFrameType();
        UInt_t GetRevision();
-      ULong_t GetFrameSkip();
+    ULong64_t GetFrameSkip(Bool_t rewind = kFALSE);
   
        Bool_t IsLittleEndian();
        Bool_t IsBlob();
@@ -25,7 +32,8 @@ class GETHeaderBase {
 
     ULong64_t CorrectEndianness(uint8_t *variable, Short_t length);
 
-    void Read(ifstream &file);
+    void Clear();
+    void Read(ifstream &file, Bool_t rewind = kFALSE);
 
     void Print();
 
