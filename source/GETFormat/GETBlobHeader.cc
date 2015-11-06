@@ -19,6 +19,8 @@ void GETBlobHeader::Clear() {
 }
 
 void GETBlobHeader::Read(ifstream &stream) {
+  Clear();
+
   GETHeaderBase::Read(stream);
 
   stream.read((Char_t *) &  fCoboIdx, 1);

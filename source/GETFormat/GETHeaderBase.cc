@@ -35,6 +35,8 @@ void GETHeaderBase::Clear() {
 }
 
 void GETHeaderBase::Read(ifstream &stream, Bool_t rewind) {
+  Clear();
+
   stream.read((Char_t *) &   fMetaType, 1);
   stream.read((Char_t *)    fFrameSize, 3);
   stream.read((Char_t *) & fDataSource, 1);

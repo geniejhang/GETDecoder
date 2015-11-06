@@ -17,6 +17,8 @@ void GETLayerHeader::Clear() {
 }
 
 void GETLayerHeader::Read(ifstream &stream) {
+  Clear();
+
   GETHeaderBase::Read(stream);
 
   stream.read((Char_t *) fHeaderSize, 2);

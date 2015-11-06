@@ -64,6 +64,8 @@ void GETFrameHeader::Clear() {
 }
 
 void GETFrameHeader::Read(ifstream &stream) {
+  Clear();
+
   GETHeaderBase::Read(stream);
 
   stream.read((Char_t *)   fHeaderSize,   2);
