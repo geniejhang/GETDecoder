@@ -7,7 +7,7 @@
 #define GETFRAMEMERGEDBYID   0xff01
 #define GETFRAMEMERGEDBYTIME 0xff02
 
-#include "Rtypes.h"
+#include "TObject.h"
 
 #include <fstream>
 #include <iostream>
@@ -17,7 +17,7 @@
 
 using namespace std;
 
-class GETHeaderBase {
+class GETHeaderBase : public TObject {
   public:
        UInt_t GetMetaType();                       
        UInt_t GetFrameSize(Bool_t inBytes = kTRUE);
