@@ -10,7 +10,7 @@ GETLayeredFrame::GETLayeredFrame() {
 TClonesArray *GETLayeredFrame::GetFrames()           { return fFrames; }
     GETFrame *GETLayeredFrame::GetFrame(Int_t index) { return (GETFrame * ) fFrames -> At(index); }
 
-void GETLayeredFrame::Clear() {
+void GETLayeredFrame::Clear(Option_t *) {
   if (fFrames == NULL)
     fFrames = new TClonesArray("GETFrame", 48);
 

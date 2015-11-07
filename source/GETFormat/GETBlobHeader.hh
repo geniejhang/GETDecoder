@@ -14,7 +14,7 @@ class GETBlobHeader : public GETHeaderBase {
     ULong64_t GetFrameSkip();
     ULong64_t GetHeaderSkip();
 
-    void Clear();
+    void Clear(Option_t * = "");
     void Read(ifstream &Stream);
 
     void Print();

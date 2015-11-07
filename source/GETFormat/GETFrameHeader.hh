@@ -27,7 +27,7 @@ class GETFrameHeader : public GETHeaderBase {
      ULong64_t GetFrameSkip();
         UInt_t GetHeaderSkip();
 
-    void Clear();
+    void Clear(Option_t * = "");
     void Read(ifstream &stream);
 
     void Print();

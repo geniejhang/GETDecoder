@@ -45,7 +45,7 @@ UInt_t GETFrameHeader::GetLastCell(Int_t asadIdx) {
 ULong64_t GETFrameHeader::GetFrameSkip()               { return GetFrameSize() - GetHeaderSize(); }
    UInt_t GETFrameHeader::GetHeaderSkip()              { return GetHeaderSize() - GETFRAMEHEADERSIZE; }
 
-void GETFrameHeader::Clear() {
+void GETFrameHeader::Clear(Option_t *) {
   GETHeaderBase::Clear();
 
   memset( fHeaderSize, 0, sizeof(uint8_t)*  2);
@@ -99,7 +99,7 @@ void GETFrameHeader::Print() {
   cout << "  headerSize: " << GetHeaderSize(kFALSE) << " (" << dec << GetHeaderSize(kFALSE) << " Blocks = " << GetHeaderSize() << hex << " Bytes)" << endl;
   cout << "    itemSize: " << GetItemSize() << endl;
   cout << "      nItems: " << GetNItems() << dec << " (" << GetNItems() << ")" << hex << endl;
-  cout << "   eventTime: " << dec << GetEventTime() << endl;
+  cout << "   eventTime: " << GetEventTime() << dec << " (" << GetEventTime() << ")" << endl;
   cout << "    eventIdx: " << GetEventIdx() << endl;
   cout << "     coboIdx: " << GetCoboIdx() << endl;
   cout << "     asadIdx: " << GetAsadIdx() << endl;

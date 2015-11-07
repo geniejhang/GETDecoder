@@ -32,7 +32,7 @@ class GETHeaderBase : public TObject {
 
     ULong64_t CorrectEndianness(uint8_t *variable, Short_t length);
 
-    void Clear();
+    void Clear(Option_t * = "");
     void Read(ifstream &file, Bool_t rewind = kFALSE);
 
     void Print();

@@ -9,7 +9,7 @@ ClassImp(GETBlobHeader)
 ULong64_t GETBlobHeader::GetFrameSkip()  { return 0; }
 ULong64_t GETBlobHeader::GetHeaderSkip() { return 0; }
 
-void GETBlobHeader::Clear() {
+void GETBlobHeader::Clear(Option_t *) {
   GETHeaderBase::Clear();
 
   memset(&fCoboIdx,  0, sizeof(uint8_t));

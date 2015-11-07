@@ -26,7 +26,7 @@ ULong64_t GETHeaderBase::CorrectEndianness(uint8_t *variable, Short_t length) {
   return returnVal;
 }
 
-void GETHeaderBase::Clear() {
+void GETHeaderBase::Clear(Option_t *) {
   memset(&fMetaType,   0, sizeof(uint8_t)*1);
   memset( fFrameSize,  0, sizeof(uint8_t)*3);
   memset(&fDataSource, 0, sizeof(uint8_t)*1);

@@ -14,7 +14,7 @@ class GETLayeredFrame : public GETLayerHeader {
     TClonesArray *GetFrames();
         GETFrame *GetFrame(Int_t index);
 
-            void  Clear();
+            void  Clear(Option_t * = "");
             void  Read(ifstream &stream);
 
   private:
