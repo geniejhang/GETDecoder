@@ -8,7 +8,7 @@ Double_t *GETFrame::GetADC(Int_t agetIdx, Int_t chIdx) { return fADC + GetIndex(
 
 Int_t GETFrame::GetFrameSkip() { return GetFrameSize() - GETFRAMEHEADERSIZE - GetHeaderSkip() - GetItemSize()*GetNItems(); }
 
-void GETFrame::Clear() {
+void GETFrame::Clear(Option_t *) {
   GETFrameHeader::Clear();
 
   memset(fRawADC, 0, sizeof(Int_t)*4*68*512);

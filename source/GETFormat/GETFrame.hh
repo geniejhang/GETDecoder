@@ -13,7 +13,7 @@ class GETFrame : public GETFrameHeader {
 
        Int_t  GetFrameSkip();
 
-        void  Clear();
+        void  Clear(Option_t * = "");
         void  Read(ifstream &stream);
 
   private:
