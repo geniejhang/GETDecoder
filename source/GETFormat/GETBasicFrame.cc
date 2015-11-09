@@ -1,24 +1,24 @@
-#include "GETFrame.hh"
+#include "GETBasicFrame.hh"
 
-Int_t *GETFrame::GetRawADC(Int_t agetIdx, Int_t chIdx) { return fRawADC + GetIndex(agetIdx, chIdx, 0); }
+Int_t *GETBasicFrame::GetRawADC(Int_t agetIdx, Int_t chIdx) { return fRawADC + GetIndex(agetIdx, chIdx, 0); }
 
-    void  GETFrame::SetADC(Int_t agetIdx, Int_t chIdx, Int_t tbIdx, Double_t adc) { fADC[GetIndex(agetIdx, chIdx, tbIdx)] = adc; }
-    void  GETFrame::SetADC(Int_t agetIdx, Int_t chIdx, Double_t *adc, Int_t tbsSize) { memcpy(fADC + GetIndex(agetIdx, chIdx, 0), adc, sizeof(Double_t)*tbsSize); }
-Double_t *GETFrame::GetADC(Int_t agetIdx, Int_t chIdx) { return fADC + GetIndex(agetIdx, chIdx, 0); }
+    void  GETBasicFrame::SetADC(Int_t agetIdx, Int_t chIdx, Int_t tbIdx, Double_t adc) { fADC[GetIndex(agetIdx, chIdx, tbIdx)] = adc; }
+    void  GETBasicFrame::SetADC(Int_t agetIdx, Int_t chIdx, Double_t *adc, Int_t tbsSize) { memcpy(fADC + GetIndex(agetIdx, chIdx, 0), adc, sizeof(Double_t)*tbsSize); }
+Double_t *GETBasicFrame::GetADC(Int_t agetIdx, Int_t chIdx) { return fADC + GetIndex(agetIdx, chIdx, 0); }
 
-Int_t GETFrame::GetFrameSkip() { return GetFrameSize() - GETFRAMEHEADERSIZE - GetHeaderSkip() - GetItemSize()*GetNItems(); }
+Int_t GETBasicFrame::GetFrameSkip() { return GetFrameSize() - GETBASICFRAMEHEADERSIZE - GetHeaderSkip() - GetItemSize()*GetNItems(); }
 
-void GETFrame::Clear(Option_t *) {
-  GETFrameHeader::Clear();
+void GETBasicFrame::Clear(Option_t *) {
+  GETBasicFrameHeader::Clear();
 
   memset(fRawADC, 0, sizeof(Int_t)*4*68*512);
   memset(fADC,    0, sizeof(Int_t)*4*68*512);
 }
 
-void GETFrame::Read(ifstream &stream) {
+void GETBasicFrame::Read(ifstream &stream) {
   Clear();
 
-  GETFrameHeader::Read(stream);
+  GETBasicFrameHeader::Read(stream);
 
   if (GetFrameType() == GETFRAMEBASICTYPE1) {
     uint8_t data[4];
@@ -53,4 +53,4 @@ void GETFrame::Read(ifstream &stream) {
   stream.ignore(GetFrameSkip());
 }
 
-UInt_t GETFrame::GetIndex(Int_t agetIdx, Int_t chIdx, Int_t tbIdx) { return agetIdx*68*512 + chIdx*512 + tbIdx; }
+UInt_t GETBasicFrame::GetIndex(Int_t agetIdx, Int_t chIdx, Int_t tbIdx) { return agetIdx*68*512 + chIdx*512 + tbIdx; }

@@ -1,9 +1,9 @@
-#ifndef GETFRAME
-#define GETFRAME
+#ifndef GETBASICFRAME
+#define GETBASICFRAME
 
-#include "GETFrameHeader.hh"
+#include "GETBasicFrameHeader.hh"
 
-class GETFrame : public GETFrameHeader {
+class GETBasicFrame : public GETBasicFrameHeader {
   public:
        Int_t *GetRawADC(Int_t agetIdx, Int_t chIdx);
 
@@ -22,7 +22,7 @@ class GETFrame : public GETFrameHeader {
 
       UInt_t GetIndex(Int_t agetIdx, Int_t chIdx, Int_t tbIdx);
 
-  ClassDef(GETFrame, 1)
+  ClassDef(GETBasicFrame, 1)
 };
 
 #endif
