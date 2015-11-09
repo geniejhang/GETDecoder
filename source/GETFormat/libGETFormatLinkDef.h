@@ -5,11 +5,11 @@
 #pragma link off all functions;
 
 #pragma link C++ class GETHeaderBase+;
-#pragma link C++ class GETBlobHeader+;
-#pragma link C++ class GETFrameHeader+;
+#pragma link C++ class GETBasicFrameHeader+;
 #pragma link C++ class GETLayerHeader+;
 
-#pragma link C++ class GETFrame+;
+#pragma link C++ class GETTopologyFrame+;
+#pragma link C++ class GETBasicFrame+;
 #pragma link C++ class GETLayeredFrame+;
 
 #endif
