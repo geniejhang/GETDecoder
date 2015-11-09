@@ -1,11 +1,11 @@
-#ifndef GETBLOBLHEADER
-#define GETBLOBLHEADER
+#ifndef GETTOPOLOGYFRAME
+#define GETTOPOLOGYFRAME
 
 #include "GETHeaderBase.hh"
 
-#define GETBLOBHEADERSIZE (GETHEADERBASESIZE + 4)
+#define GETTOPOLOGYFRAMESIZE (GETHEADERBASESIZE + 4)
 
-class GETBlobHeader : public GETHeaderBase {
+class GETTopologyFrame : public GETHeaderBase {
   public:
        UInt_t GetCoboIdx();
        UInt_t GetAsadMask();
@@ -25,7 +25,7 @@ class GETBlobHeader : public GETHeaderBase {
     uint8_t f2pMode;
     uint8_t fUNUSED;
 
-  ClassDef(GETBlobHeader, 1)
+  ClassDef(GETTopologyFrame, 1)
 };
 
 #endif

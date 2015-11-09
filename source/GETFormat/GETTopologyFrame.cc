@@ -1,15 +1,15 @@
-#include "GETBlobHeader.hh"
+#include "GETTopologyFrame.hh"
 
-ClassImp(GETBlobHeader)
+ClassImp(GETTopologyFrame)
 
-   UInt_t GETBlobHeader::GetCoboIdx()    { return (UInt_t) fCoboIdx; }
-   UInt_t GETBlobHeader::GetAsadMask()   { return (UInt_t) fAsadMask; }
-   UInt_t GETBlobHeader::Get2pMode()     { return (UInt_t) f2pMode; }
-   UInt_t GETBlobHeader::GetUNUSED()     { return (UInt_t) fUNUSED; }
-ULong64_t GETBlobHeader::GetFrameSkip()  { return 0; }
-ULong64_t GETBlobHeader::GetHeaderSkip() { return 0; }
+   UInt_t GETTopologyFrame::GetCoboIdx()    { return (UInt_t) fCoboIdx; }
+   UInt_t GETTopologyFrame::GetAsadMask()   { return (UInt_t) fAsadMask; }
+   UInt_t GETTopologyFrame::Get2pMode()     { return (UInt_t) f2pMode; }
+   UInt_t GETTopologyFrame::GetUNUSED()     { return (UInt_t) fUNUSED; }
+ULong64_t GETTopologyFrame::GetFrameSkip()  { return 0; }
+ULong64_t GETTopologyFrame::GetHeaderSkip() { return 0; }
 
-void GETBlobHeader::Clear(Option_t *) {
+void GETTopologyFrame::Clear(Option_t *) {
   GETHeaderBase::Clear();
 
   memset(&fCoboIdx,  0, sizeof(uint8_t));
@@ -18,7 +18,7 @@ void GETBlobHeader::Clear(Option_t *) {
   memset(&fUNUSED,   0, sizeof(uint8_t));
 }
 
-void GETBlobHeader::Read(ifstream &stream) {
+void GETTopologyFrame::Read(ifstream &stream) {
   Clear();
 
   GETHeaderBase::Read(stream);
@@ -29,9 +29,9 @@ void GETBlobHeader::Read(ifstream &stream) {
   stream.read((Char_t *) &   fUNUSED, 1);
 }
 
-void GETBlobHeader::Print() {
+void GETTopologyFrame::Print() {
   cout << showbase << hex;
-  cout << " == GETBlobHeader =======================" << endl;
+  cout << " == GETTopologyFrame =======================" << endl;
   cout << "    metaType: " << GetMetaType() << endl;
   cout << "              - Endianness: " << (IsLittleEndian() ? "Little" : "Big") << endl;
   cout << "              -   Blobness: " << (IsBlob() ? "YES" : "NO") << endl;
@@ -44,5 +44,5 @@ void GETBlobHeader::Print() {
   cout << "    asadMask: " << GetAsadMask() << " (" << bitset<4>(GetAsadMask()) << ")" << endl;
   cout << "      2pMode: " << Get2pMode() << endl;
   cout << "      UNUSED: " << GetUNUSED() << endl;
-  cout << " ========================================" << endl;
+  cout << " ===========================================" << endl;
 }
