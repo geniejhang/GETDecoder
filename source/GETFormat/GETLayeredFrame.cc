@@ -6,13 +6,13 @@ GETLayeredFrame::GETLayeredFrame() {
   Clear();
 }
 
-       Int_t  GETLayeredFrame::GetNumFrames()        { return GetNItems(); }
-TClonesArray *GETLayeredFrame::GetFrames()           { return fFrames; }
-    GETFrame *GETLayeredFrame::GetFrame(Int_t index) { return (GETFrame * ) fFrames -> At(index); }
+        Int_t  GETLayeredFrame::GetNumFrames()        { return GetNItems(); }
+ TClonesArray *GETLayeredFrame::GetFrames()           { return fFrames; }
+GETBasicFrame *GETLayeredFrame::GetFrame(Int_t index) { return (GETBasicFrame * ) fFrames -> At(index); }
 
 void GETLayeredFrame::Clear(Option_t *) {
   if (fFrames == NULL)
-    fFrames = new TClonesArray("GETFrame", 48);
+    fFrames = new TClonesArray("GETBasicFrame", 48);
 
   GETLayerHeader::Clear();
   fFrames -> Clear("C");
@@ -23,8 +23,9 @@ void GETLayeredFrame::Read(ifstream &stream) {
 
   GETLayerHeader::Read(stream);
 
+  std::cout << "Here" << std::endl;
   for (Int_t iFrame = 0; iFrame < GetNItems(); iFrame++) {
-    GETFrame *frame = (GETFrame *) fFrames -> ConstructedAt(iFrame);
+    GETBasicFrame *frame = (GETBasicFrame *) fFrames -> ConstructedAt(iFrame);
     frame -> Read(stream);
   }
 }

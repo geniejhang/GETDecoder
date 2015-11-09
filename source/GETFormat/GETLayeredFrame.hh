@@ -2,7 +2,7 @@
 #define GETLAYEREDFRAME
 
 #include "GETLayerHeader.hh"
-#include "GETFrame.hh"
+#include "GETBasicFrame.hh"
 
 #include "TClonesArray.h"
 
@@ -10,15 +10,15 @@ class GETLayeredFrame : public GETLayerHeader {
   public:
     GETLayeredFrame();
 
-           Int_t  GetNumFrames();
-    TClonesArray *GetFrames();
-        GETFrame *GetFrame(Int_t index);
+            Int_t  GetNumFrames();
+     TClonesArray *GetFrames();
+    GETBasicFrame *GetFrame(Int_t index);
 
-            void  Clear(Option_t * = "");
-            void  Read(ifstream &stream);
+             void  Clear(Option_t * = "");
+             void  Read(ifstream &stream);
 
   private:
-    TClonesArray *fFrames;
+     TClonesArray *fFrames;
 
   ClassDef(GETLayeredFrame, 1);
 };
