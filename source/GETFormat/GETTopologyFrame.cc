@@ -3,7 +3,7 @@
 ClassImp(GETTopologyFrame)
 
    UInt_t GETTopologyFrame::GetCoboIdx()    { return (UInt_t) fCoboIdx; }
-   UInt_t GETTopologyFrame::GetAsadMask()   { return (UInt_t) fAsadMask; }
+bitset<4> GETTopologyFrame::GetAsadMask()   { return bitset<4>((UInt_t) fAsadMask); }
    UInt_t GETTopologyFrame::Get2pMode()     { return (UInt_t) f2pMode; }
    UInt_t GETTopologyFrame::GetUNUSED()     { return (UInt_t) fUNUSED; }
 ULong64_t GETTopologyFrame::GetFrameSkip()  { return 0; }

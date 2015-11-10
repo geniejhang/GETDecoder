@@ -3,12 +3,16 @@
 
 #include "GETHeaderBase.hh"
 
+#include <bitset>
+
+using std::bitset;
+
 #define GETTOPOLOGYFRAMESIZE (GETHEADERBASESIZE + 4)
 
 class GETTopologyFrame : public GETHeaderBase {
   public:
        UInt_t GetCoboIdx();
-       UInt_t GetAsadMask();
+    bitset<4> GetAsadMask();
        UInt_t Get2pMode();
        UInt_t GetUNUSED();
     ULong64_t GetFrameSkip();
