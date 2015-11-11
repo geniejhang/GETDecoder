@@ -73,7 +73,7 @@ class GETDecoder : public TObject
     EFrameType GetFrameType();
 
     //! Return specific frame of the given frame number. If **frameID** is -1, this method returns next frame.
-//      GETBasicFrame *GetFrame(Int_t frameID = -1);
+      GETBasicFrame *GetBasicFrame(Int_t frameID = -1);
 //       GETCoboFrame *GetCoboFrame(Int_t frameID = -1);
     GETLayeredFrame *GetLayeredFrame(Int_t frameID = -1);
 

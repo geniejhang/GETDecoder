@@ -272,11 +272,61 @@ GETBasicFrame *GETDecoder::GetFrame(Int_t frameID)
 */
 
 
-/*
 GETBasicFrame *GETDecoder::GetBasicFrame(Int_t frameID)
 {
+  fData.clear();
+
+  if (frameID == -1)
+    fTargetFrameInfoIdx++;
+  else
+    fTargetFrameInfoIdx = frameID;
+
+  if (fIsDoneAnalyzing)
+    if (fTargetFrameInfoIdx > fFrameInfoArray -> GetLast())
+      return NULL;
+
+  if (fFrameInfoIdx > fTargetFrameInfoIdx)
+    fFrameInfoIdx = fTargetFrameInfoIdx;
+
+  fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> ConstructedAt(fFrameInfoIdx);
+  while (fFrameInfo -> IsFill()) {
+
+#ifdef DEBUG
+    cout << "fFrameInfoIdx: " << fFrameInfoIdx << " fTargetFrameInfoIdx: " << fTargetFrameInfoIdx << endl;
+#endif
+
+    if (fFrameInfoIdx == fTargetFrameInfoIdx) {
+      if (fFrameInfo -> GetDataID() != fCurrentDataID)
+        SetData(fFrameInfo -> GetDataID());
+
+      fData.seekg(fFrameInfo -> GetStartByte());
+      fBasicFrame -> Read(fData);
+
+#ifdef DEBUG
+    cout << "Returned event ID: " << fBasicFrame -> GetEventID() << endl;
+#endif
+
+      return fBasicFrame;
+    } else
+      fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> ConstructedAt(++fFrameInfoIdx);
+  }
+
+  fBasicFrameHeader -> Read(fData);
+  fData.ignore(fBasicFrameHeader -> GetFrameSkip());
+
+  fFrameInfo -> SetDataID(fCurrentDataID);
+  fFrameInfo -> SetStartByte((ULong64_t) fData.tellg() - fBasicFrameHeader -> GetFrameSize());
+  fFrameInfo -> SetEndByte(fData.tellg());
+  fFrameInfo -> SetEventID(fBasicFrameHeader -> GetEventID());
+
+  if (fFrameInfo -> GetEndByte() == fDataSize)
+    if (!NextData())
+      fIsDoneAnalyzing = kTRUE;
+
+  return GetBasicFrame(fTargetFrameInfoIdx);
 }
 
+/*
 GETCoboFrame *GETDecoder::GetCoboFrame(Int_t frameID)
 {
 }
@@ -300,9 +350,11 @@ GETLayeredFrame *GETDecoder::GetLayeredFrame(Int_t frameID)
 
   fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> ConstructedAt(fFrameInfoIdx);
   while (fFrameInfo -> IsFill()) {
+
 #ifdef DEBUG
     cout << "fFrameInfoIdx: " << fFrameInfoIdx << " fTargetFrameInfoIdx: " << fTargetFrameInfoIdx << endl;
 #endif
+
     if (fFrameInfoIdx == fTargetFrameInfoIdx) {
       if (fFrameInfo -> GetDataID() != fCurrentDataID)
         SetData(fFrameInfo -> GetDataID());
@@ -342,55 +394,6 @@ GETLayeredFrame *GETDecoder::GetLayeredFrame(Int_t frameID)
 
   return GetLayeredFrame(fTargetFrameInfoIdx);
 }
-
-/*
-GETLayeredFrame *GETDecoder::GetLayeredFrame(Int_t frameID)
-{
-  if (frameID == -1)
-    fCurrentFrameID++;
-  else {
-    if (frameID > fCurrentFrameID)
-      SkipFrames(frameID);
-
-    fCurrentFrameID = frameID;
-  }
-
-  fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> ConstructedAt(fCurrentFrameID);
-  if (fFrameInfo -> IsFill()) {
-
-#ifdef DEBUG
-  LOG(INFO) << "Frame info of frame ID: " << fCurrentFrameID << " already exists!" << endl;
-  fFrameInfo -> Print();
-#endif
-
-    if (fFrameInfo -> GetDataID() != fCurrentDataID)
-      SetData(fFrameInfo -> GetDataID());
-
-    fData.seekg(fFrameInfo -> GetStartByte());
-    fLayeredFrame -> Read(fData);
-
-    return fLayeredFrame;
-  } else {
-    if (fData.tellg() == fDataSize) {
-      if (SetNextData() && fIsAutoReload)
-        return GetLayeredFrame(frameID);
-      else {
-        fFrameInfoArray -> RemoveAt(fCurrentFrameID);
-        return NULL;
-      }
-    }
-
-    fLayeredFrame -> Read(fData);
-
-    fFrameInfo -> SetEventID(fLayeredFrame -> GetEventID());
-    fFrameInfo -> SetStartByte((ULong64_t) fData.tellg() - fLayeredFrame -> GetFrameSize());
-    fFrameInfo -> SetEndByte((ULong64_t) fData.tellg());
-    fFrameInfo -> SetDataID(fCurrentDataID);
-
-    return fLayeredFrame;
-  }
-}
-*/
 
 void GETDecoder::SkipFrames(Int_t frameID) {
   Int_t entriesInArray  = fFrameInfoArray -> GetEntriesFast();
