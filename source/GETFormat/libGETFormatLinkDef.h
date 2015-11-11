@@ -10,6 +10,7 @@
 
 #pragma link C++ class GETTopologyFrame+;
 #pragma link C++ class GETBasicFrame+;
+#pragma link C++ class GETCoboFrame+;
 #pragma link C++ class GETLayeredFrame+;
 
 #endif
