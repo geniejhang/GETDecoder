@@ -23,7 +23,6 @@ void GETLayeredFrame::Read(ifstream &stream) {
 
   GETLayerHeader::Read(stream);
 
-  std::cout << "Here" << std::endl;
   for (Int_t iFrame = 0; iFrame < GetNItems(); iFrame++) {
     GETBasicFrame *frame = (GETBasicFrame *) fFrames -> ConstructedAt(iFrame);
     frame -> Read(stream);
