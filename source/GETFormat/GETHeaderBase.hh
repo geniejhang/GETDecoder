@@ -19,6 +19,8 @@ using namespace std;
 
 class GETHeaderBase : public TObject {
   public:
+    GETHeaderBase();
+
        UInt_t GetMetaType();                       
        UInt_t GetFrameSize(Bool_t inBytes = kTRUE);
        UInt_t GetDataSource();

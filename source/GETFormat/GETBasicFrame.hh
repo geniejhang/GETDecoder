@@ -5,6 +5,8 @@
 
 class GETBasicFrame : public GETBasicFrameHeader {
   public:
+    GETBasicFrame();
+
        Int_t *GetRawADC(Int_t agetIdx, Int_t chIdx);
 
         void  SetADC(Int_t agetIdx, Int_t chIdx, Int_t tbIdx, Double_t adc);

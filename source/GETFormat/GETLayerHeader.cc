@@ -2,6 +2,10 @@
 
 ClassImp(GETLayerHeader)
 
+GETLayerHeader::GETLayerHeader() {
+  Clear();
+}
+
    UInt_t GETLayerHeader::GetHeaderSize(Bool_t inBytes)  { return CorrectEndianness(fHeaderSize, 2)*(inBytes ? GetUnitBlock() : 1); }
    UInt_t GETLayerHeader::GetItemSize()                  { return CorrectEndianness(fItemSize, 2); }
    UInt_t GETLayerHeader::GetNItems()                    { return CorrectEndianness(fNItems, 4); }

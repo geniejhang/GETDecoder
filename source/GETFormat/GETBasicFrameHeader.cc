@@ -2,6 +2,10 @@
 
 ClassImp(GETBasicFrameHeader)
 
+GETBasicFrameHeader::GETBasicFrameHeader() {
+  Clear();
+}
+
  UInt_t GETBasicFrameHeader::GetHeaderSize(Bool_t inBytes)  { return CorrectEndianness(fHeaderSize, 2)*(inBytes ? GetUnitBlock() : 1); }
  UInt_t GETBasicFrameHeader::GetItemSize()                  { return CorrectEndianness(fItemSize, 2); }
  UInt_t GETBasicFrameHeader::GetNItems()                    { return CorrectEndianness(fNItems, 4); }

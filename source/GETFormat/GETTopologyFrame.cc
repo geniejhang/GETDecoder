@@ -2,6 +2,10 @@
 
 ClassImp(GETTopologyFrame)
 
+GETTopologyFrame::GETTopologyFrame() {
+  Clear();
+}
+
    UInt_t GETTopologyFrame::GetCoboIdx()    { return (UInt_t) fCoboIdx; }
 bitset<4> GETTopologyFrame::GetAsadMask()   { return bitset<4>((UInt_t) fAsadMask); }
    UInt_t GETTopologyFrame::Get2pMode()     { return (UInt_t) f2pMode; }

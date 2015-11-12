@@ -1,5 +1,9 @@
 #include "GETBasicFrame.hh"
 
+GETBasicFrame::GETBasicFrame() {
+  Clear();
+}
+
 Int_t *GETBasicFrame::GetRawADC(Int_t agetIdx, Int_t chIdx) { return fRawADC + GetIndex(agetIdx, chIdx, 0); }
 
     void  GETBasicFrame::SetADC(Int_t agetIdx, Int_t chIdx, Int_t tbIdx, Double_t adc) { fADC[GetIndex(agetIdx, chIdx, tbIdx)] = adc; }

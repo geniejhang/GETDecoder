@@ -2,6 +2,10 @@
 
 ClassImp(GETHeaderBase)
 
+GETHeaderBase::GETHeaderBase() {
+  Clear();
+}
+
    UInt_t GETHeaderBase::GetMetaType()                 { return (UInt_t) fMetaType; }
    UInt_t GETHeaderBase::GetFrameSize(Bool_t inBytes)  { return CorrectEndianness(fFrameSize, 3)*(inBytes ? GetUnitBlock() : 1); }
    UInt_t GETHeaderBase::GetDataSource()               { return (UInt_t) fDataSource; }

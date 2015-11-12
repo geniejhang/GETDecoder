@@ -11,6 +11,8 @@ using std::bitset;
 
 class GETBasicFrameHeader : public GETHeaderBase {
   public:
+    GETBasicFrameHeader();
+
         UInt_t GetHeaderSize(Bool_t inBytes = kTRUE);
         UInt_t GetItemSize();
         UInt_t GetNItems();

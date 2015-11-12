@@ -11,6 +11,8 @@ using std::bitset;
 
 class GETTopologyFrame : public GETHeaderBase {
   public:
+    GETTopologyFrame();
+
        UInt_t GetCoboIdx();
     bitset<4> GetAsadMask();
        UInt_t Get2pMode();

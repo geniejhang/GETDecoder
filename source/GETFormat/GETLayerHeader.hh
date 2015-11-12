@@ -8,6 +8,8 @@
 
 class GETLayerHeader : public GETHeaderBase {
   public:
+    GETLayerHeader();
+
        UInt_t GetHeaderSize(Bool_t inBytes = kTRUE);
        UInt_t GetItemSize();
        UInt_t GetNItems();
