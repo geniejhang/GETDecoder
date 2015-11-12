@@ -46,8 +46,6 @@ class GETDecoder : public TObject
     //! Frame type enumerator
     enum EFrameType { kBasic, kCobo, kMergedID, kMergedTime };
 
-    //! Setting debug mode. If set to 1, more information is printed out on the screen.
-    void SetDebugMode(Bool_t value = kTRUE);
     //! Setting the number of time buckets.
     void SetNumTbs(Int_t value = 512);
     //! Add the data file to the list of rawdata.
@@ -72,15 +70,13 @@ class GETDecoder : public TObject
     //! Return the frame type. This is used when drawing merged frame.
     EFrameType GetFrameType();
 
+    Int_t GetNumFrames();
     //! Return specific frame of the given frame number. If **frameID** is -1, this method returns next frame.
       GETBasicFrame *GetBasicFrame(Int_t frameID = -1);
-//       GETCoboFrame *GetCoboFrame(Int_t frameID = -1);
+       GETCoboFrame *GetCoboFrame(Int_t frameID = -1);
     GETLayeredFrame *GetLayeredFrame(Int_t frameID = -1);
 
-    void SkipFrames(Int_t frameID);
-    Bool_t CheckEOF();
     void PrintFrameInfo(Int_t frameID = -1);
-
 
     //! Set the file for writing frame
 //    Bool_t SetWriteFile(TString filename, Bool_t overwrite = kFALSE);
@@ -101,7 +97,9 @@ class GETDecoder : public TObject
      GETLayeredFrame *fLayeredFrame;
 
     TClonesArray *fFrameInfoArray;
+    TClonesArray *fCoboFrameInfoArray;
     GETFrameInfo *fFrameInfo;
+    GETFrameInfo *fCoboFrameInfo;
 
     Int_t fNumTbs; /// the number of time buckets. It's determined when taking data and should be changed manually by user. (Default: 512)
 
@@ -110,7 +108,6 @@ class GETDecoder : public TObject
 
     Bool_t fIsDataInfo;             ///< Flag for data information existance
     Bool_t fIsDoneAnalyzing;        ///< Flag for all the frame info are read
-    Bool_t fDebugMode; /// flag for debug mode
     Bool_t fIsPositivePolarity; /// Flag for the signal polarity
 
     std::ifstream fData;            ///< Current file data stream

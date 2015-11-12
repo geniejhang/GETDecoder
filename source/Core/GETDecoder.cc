@@ -29,7 +29,9 @@
 ClassImp(GETDecoder);
 
 GETDecoder::GETDecoder()
-:fFrameInfoArray(NULL), fHeaderBase(NULL), fBasicFrameHeader(NULL), fLayerHeader(NULL), fTopologyFrame(NULL), fBasicFrame(NULL), fCoboFrame(NULL), fLayeredFrame(NULL), fFrameInfo(NULL)
+:fFrameInfoArray(NULL), fCoboFrameInfoArray(NULL), fFrameInfo(NULL), fCoboFrameInfo(NULL),
+ fHeaderBase(NULL), fBasicFrameHeader(NULL), fLayerHeader(NULL),
+ fTopologyFrame(NULL), fBasicFrame(NULL), fCoboFrame(NULL), fLayeredFrame(NULL)
 {
   /**
     * If you use this constructor, you have to add the rawdata using
@@ -40,7 +42,9 @@ GETDecoder::GETDecoder()
 }
 
 GETDecoder::GETDecoder(TString filename)
-:fFrameInfoArray(NULL), fHeaderBase(NULL), fBasicFrameHeader(NULL), fLayerHeader(NULL), fTopologyFrame(NULL), fBasicFrame(NULL), fCoboFrame(NULL), fLayeredFrame(NULL), fFrameInfo(NULL)
+:fFrameInfoArray(NULL), fCoboFrameInfoArray(NULL), fFrameInfo(NULL), fCoboFrameInfo(NULL),
+ fHeaderBase(NULL), fBasicFrameHeader(NULL), fLayerHeader(NULL),
+ fTopologyFrame(NULL), fBasicFrame(NULL), fCoboFrame(NULL), fLayeredFrame(NULL)
 {
   /**
     * Automatically add the rawdata file to the list
@@ -57,15 +61,15 @@ void GETDecoder::Initialize()
   fNumTbs = 512;
 
   fFrameType = kBasic;
-  fFrameSize = 0;
 
-  fDebugMode = kFALSE;
   fIsPositivePolarity = kFALSE;
 
   fIsDoneAnalyzing = kFALSE;
   fIsDataInfo = kFALSE;
+
   fDataSize = 0;
   fCurrentDataID = -1;
+
   fFrameInfoIdx = 0;
   fCoboFrameInfoIdx = 0;
   fTargetFrameInfoIdx = -1;
@@ -75,8 +79,11 @@ void GETDecoder::Initialize()
   fBuffer = NULL;
   fWriteFile = "";
 
-  if (fFrameInfoArray == NULL) fFrameInfoArray = new TClonesArray("GETFrameInfo", 10000);
+  if (    fFrameInfoArray == NULL) fFrameInfoArray = new TClonesArray("GETFrameInfo", 10000);
   fFrameInfoArray -> Clear("C");
+
+  if (fCoboFrameInfoArray == NULL) fCoboFrameInfoArray = new TClonesArray("GETFrameInfo", 10000);
+  fCoboFrameInfoArray -> Clear("C");
 
   if (      fHeaderBase == NULL) fHeaderBase = new GETHeaderBase();
   else                           fHeaderBase -> Clear();
@@ -101,7 +108,6 @@ void GETDecoder::Initialize()
 }
 
 void GETDecoder::SetNumTbs(Int_t value) { fNumTbs = value; } 
-void GETDecoder::SetDebugMode(Bool_t value) { fDebugMode = value; }
 
 Bool_t GETDecoder::AddData(TString filename)
 {
@@ -159,16 +165,15 @@ Bool_t GETDecoder::SetData(Int_t index)
   if (!fIsDataInfo) {
     fHeaderBase -> Read(fData, kTRUE);
 
-    if (fHeaderBase -> IsBlob()) {
+    if (fHeaderBase -> IsBlob())
       fTopologyFrame -> Read(fData);
-      fHeaderBase -> Read(fData, kTRUE);
-    }
 
     std::cout << "== [GETDecoder] Frame Type: ";
     if (fTopologyFrame -> IsBlob()) {
       fFrameType = kCobo;
       std::cout << "Cobo frame (Max. 4 frames)" << std::endl;
     } else {
+      fHeaderBase -> Read(fData, kTRUE);
       switch (fHeaderBase -> GetFrameType()) {
         case GETFRAMEMERGEDBYID:
           fFrameType = kMergedID;
@@ -228,49 +233,22 @@ Int_t GETDecoder::GetNumTbs() { return fNumTbs; }
 //GETPlot *GETDecoder::GetGETPlot() { if (!fGETPlot) fGETPlot = new GETPlot(this); return fGETPlot; }
 GETDecoder::EFrameType GETDecoder::GetFrameType() { return fFrameType; }
 
-/*
-GETBasicFrame *GETDecoder::GetFrame(Int_t frameID)
-{
-  if (frameID == -1)
-    fCurrentFrameID++;
-  else {
-    if (frameID > fCurrentFrameID)
-      SkipFrames(frameID);
+Int_t GETDecoder::GetNumFrames() {
+   if (fIsDoneAnalyzing)
+     switch (fFrameType) {
+       case kBasic:
+       case kMergedID:
+       case kMergedTime:
+         return fFrameInfoArray -> GetEntriesFast(); 
+         break;
 
-    fCurrentFrameID = frameID;
-  }
+       case kCobo:
+         return fCoboFrameInfoArray -> GetEntriesFast();
+         break;
+     }
 
-  fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> ConstructedAt(fCurrentFrameID);
-  if (fFrameInfo -> IsFill()) {
-    if (fFrameInfo -> GetDataID() != fCurrentDataID)
-      SetData(fFrameInfo -> GetDataID());
-
-    fData.seekg(fFrameInfo -> GetStartByte());
-    fBasicFrame -> Read(fData);
-
-    return fBasicFrame;
-  } else {
-    if (fData.tellg() == fDataSize) {
-      if (SetNextData() && fIsAutoReload)
-        return GetFrame(frameID);
-      else {
-        fFrameInfoArray -> RemoveAt(fCurrentFrameID);
-        return NULL;
-      }
-    }
-
-    fBasicFrame -> Read(fData);
-
-    fFrameInfo -> SetEventID(fBasicFrame -> GetEventID());
-    fFrameInfo -> SetStartByte((ULong64_t) fData.tellg() - fBasicFrame -> GetFrameSize());
-    fFrameInfo -> SetEndByte(fData.tellg());
-    fFrameInfo -> SetDataID(fCurrentDataID);
-
-    return fBasicFrame;
-  }
+  return -1;
 }
-*/
-
 
 GETBasicFrame *GETDecoder::GetBasicFrame(Int_t frameID)
 {
@@ -326,11 +304,97 @@ GETBasicFrame *GETDecoder::GetBasicFrame(Int_t frameID)
   return GetBasicFrame(fTargetFrameInfoIdx);
 }
 
-/*
 GETCoboFrame *GETDecoder::GetCoboFrame(Int_t frameID)
 {
+  fData.clear();
+
+  if (frameID == -1)
+    fTargetFrameInfoIdx++;
+  else
+    fTargetFrameInfoIdx = frameID;
+
+  if (fIsDoneAnalyzing)
+    if (fTargetFrameInfoIdx > fCoboFrameInfoArray -> GetLast())
+      return NULL;
+
+  if (fCoboFrameInfoIdx > fTargetFrameInfoIdx)
+    fCoboFrameInfoIdx = fTargetFrameInfoIdx;
+
+  fCoboFrameInfo = (GETFrameInfo *) fCoboFrameInfoArray -> ConstructedAt(fCoboFrameInfoIdx);
+  while (fCoboFrameInfo -> IsFill()) {
+
+#ifdef DEBUG
+    cout << "fFrameInfoIdx: " << fFrameInfoIdx << " fCoboFrameInfoIdx: " << fCoboFrameInfoIdx << " fTargetFrameInfoIdx: " << fTargetFrameInfoIdx << endl;
+#endif
+
+#ifdef DEBUG
+    cout << "fCoboFrameInfo -> GetNumFrames(): " << fCoboFrameInfo -> GetNumFrames() << " fTopologyFrame -> GetAsadMask().count(): " << fTopologyFrame -> GetAsadMask().count() << endl;
+#endif
+
+    if (fCoboFrameInfo -> GetNumFrames() == fTopologyFrame -> GetAsadMask().count()) {
+      if (fCoboFrameInfoIdx == fTargetFrameInfoIdx) {
+        fCoboFrame -> Clear();
+
+        if (fCoboFrameInfo -> GetDataID() != fCurrentDataID)
+          SetData(fCoboFrameInfo -> GetDataID());
+
+        fCoboFrameInfo = (GETFrameInfo *) fCoboFrameInfoArray -> ConstructedAt(fCoboFrameInfoIdx);
+        for (Int_t iFrame = 0; iFrame < fTopologyFrame -> GetAsadMask().count(); iFrame++) {
+          fData.seekg(fCoboFrameInfo -> GetStartByte());
+          fCoboFrame -> ReadFrame(fData);
+          fCoboFrameInfo = fCoboFrameInfo -> GetNextInfo();
+        }
+
+#ifdef DEBUG
+    cout << "Returned fCoboFrameInfoIdx: " << fCoboFrameInfoIdx << " with event ID: " << fCoboFrame -> GetFrame(0) -> GetEventID() << endl;
+#endif
+
+        return fCoboFrame;
+      } else 
+        fCoboFrameInfo = (GETFrameInfo *) fCoboFrameInfoArray -> ConstructedAt(++fCoboFrameInfoIdx);
+    } else
+      break;
+  }
+
+#ifdef DEBUG
+    cout << "Not full in fCoboFrameInfoIdx: " << fCoboFrameInfoIdx << ", reading fFrameInfoIdx: " << fFrameInfoIdx << endl;
+#endif
+
+  fBasicFrameHeader -> Read(fData);
+  fData.ignore(fBasicFrameHeader -> GetFrameSkip());
+
+  fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> ConstructedAt(fFrameInfoIdx++);
+  fFrameInfo -> SetDataID(fCurrentDataID);
+  fFrameInfo -> SetStartByte((ULong64_t) fData.tellg() - fBasicFrameHeader -> GetFrameSize());
+  fFrameInfo -> SetEndByte(fData.tellg());
+  fFrameInfo -> SetEventID(fBasicFrameHeader -> GetEventID());
+
+  if (fFrameInfo -> GetEndByte() == fDataSize)
+    if (!NextData())
+      fIsDoneAnalyzing = kTRUE;
+
+  if (fCoboFrameInfo -> GetNumFrames() == 0)
+    fCoboFrameInfo -> Copy(fFrameInfo);
+  else if (fCoboFrameInfo -> GetEventID() == fFrameInfo -> GetEventID())
+    fCoboFrameInfo -> SetNextInfo(fFrameInfo); 
+  else {
+    Int_t iChecker = 0;
+    while (GETFrameInfo *checkCoboFrameInfo = (GETFrameInfo *) fCoboFrameInfoArray -> ConstructedAt(iChecker)) {
+      if (checkCoboFrameInfo -> IsFill()) {
+        if (checkCoboFrameInfo -> GetEventID() == fFrameInfo -> GetEventID()) {
+          checkCoboFrameInfo -> SetNextInfo(fFrameInfo); 
+          break;
+        } else
+          iChecker++;
+      } else {
+        checkCoboFrameInfo -> Copy(fFrameInfo);
+        break;
+      }
+    }
+  }
+
+  return GetCoboFrame(fTargetFrameInfoIdx);
 }
-*/
 
 GETLayeredFrame *GETDecoder::GetLayeredFrame(Int_t frameID)
 {
@@ -394,103 +458,6 @@ GETLayeredFrame *GETDecoder::GetLayeredFrame(Int_t frameID)
 
   return GetLayeredFrame(fTargetFrameInfoIdx);
 }
-
-void GETDecoder::SkipFrames(Int_t frameID) {
-  Int_t entriesInArray  = fFrameInfoArray -> GetEntriesFast();
-
-  if (frameID <= entriesInArray) {
-#ifdef DEBUG
-  LOG(DEBUG) << "There're " << entriesInArray << " entries in fFrameInfoArray. Exit " << __FUNCTION__ << endl;
-#endif
-
-    return;
-  }
-
-  fData.seekg(((GETFrameInfo *) fFrameInfoArray -> Last()) -> GetEndByte());
-
-  switch (fFrameType) {
-    case kBasic:
-      while (1) {
-        fBasicFrameHeader -> Read(fData);
-
-        fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> ConstructedAt(entriesInArray++);
-        fFrameInfo -> SetEventID(fBasicFrameHeader -> GetEventID());
-        fFrameInfo -> SetStartByte((ULong64_t) fData.tellg() - fBasicFrameHeader -> GetHeaderSize());
-        fFrameInfo -> SetEndByte(fFrameInfo -> GetStartByte() + fBasicFrameHeader -> GetFrameSize());
-        fFrameInfo -> SetDataID(fCurrentDataID);
-
-        fData.ignore(fBasicFrameHeader -> GetFrameSkip());
-
-#ifdef DEBUG
-  LOG(DEBUG) << "Skipping frames. entriesInArray: " << entriesInArray << endl;
-#endif
-
-        if (entriesInArray == frameID)
-          break;
-
-//        if (CheckEOF()) {
-//          if (fIsAutoReload) { if (!SetNextData()) break; }
-//          else                 break;
-//        }
-      }
-      break;
-
-    case kMergedTime:
-      while (1) {
-        fLayerHeader -> Read(fData);
-
-        fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> ConstructedAt(entriesInArray++);
-        fFrameInfo -> SetEventTime(fLayerHeader -> GetEventTime());
-        fFrameInfo -> SetDeltaT(fLayerHeader -> GetDeltaT());
-        fFrameInfo -> SetStartByte((ULong64_t) fData.tellg() - fLayerHeader -> GetHeaderSize());
-        fFrameInfo -> SetEndByte(fFrameInfo -> GetStartByte() + fLayerHeader -> GetFrameSize());
-        fFrameInfo -> SetDataID(fCurrentDataID);
-
-        fData.ignore(fLayerHeader -> GetFrameSkip());
-
-#ifdef DEBUG
-  LOG(DEBUG) << "Skipping frames. entriesInArray: " << entriesInArray << endl;
-#endif
-
-        if (entriesInArray == frameID)
-          break;
-
-//        if (CheckEOF()) {
-//          if (fIsAutoReload) { if (!SetNextData()) break; }
-//          else                 break;
-//        }
-      }
-      break; 
-
-    case kMergedID:
-      while (1) {
-        fLayerHeader -> Read(fData);
-
-        fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> ConstructedAt(entriesInArray++);
-        fFrameInfo -> SetEventID(fLayerHeader -> GetEventID());
-        fFrameInfo -> SetStartByte((ULong64_t) fData.tellg() - fLayerHeader -> GetHeaderSize());
-        fFrameInfo -> SetEndByte(fFrameInfo -> GetStartByte() + fLayerHeader -> GetFrameSize());
-        fFrameInfo -> SetDataID(fCurrentDataID);
-
-        fData.ignore(fLayerHeader -> GetFrameSkip());
-
-#ifdef DEBUG
-  LOG(DEBUG) << "Skipping frames. entriesInArray: " << entriesInArray << endl;
-#endif
-
-        if (entriesInArray == frameID)
-          break;
-
-//        if (CheckEOF()) {
-//          if (fIsAutoReload) { if (!SetNextData()) break; }
-//          else                 break;
-//        }
-      }
-      break; 
-  }
-}
-
-Bool_t GETDecoder::CheckEOF() { return (fDataSize == fFrameInfo -> GetEndByte()); }
 
 void GETDecoder::PrintFrameInfo(Int_t frameID) {
   if (frameID == -1) {
