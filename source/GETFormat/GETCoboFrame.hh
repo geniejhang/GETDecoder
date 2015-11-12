@@ -7,8 +7,8 @@ class GETCoboFrame : public TObject {
   public:
     GETCoboFrame();
 
-             void  AddFrame(GETBasicFrame *frame);
-             void  SetFrame(Int_t index, GETBasicFrame *frame);
+             void  ReadFrame(ifstream &stream);
+             void  ReadFrame(Int_t index, ifstream &stream);
 
             Int_t  GetNumFrames();
     GETBasicFrame *GetFrames();

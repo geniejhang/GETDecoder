@@ -4,13 +4,13 @@ GETCoboFrame::GETCoboFrame() {
   Clear();
 }
 
-void GETCoboFrame::AddFrame(GETBasicFrame *frame) {
-  fFrame[fNumFrames++] = *frame;
+void GETCoboFrame::ReadFrame(ifstream &stream) {
+  fFrame[fNumFrames++].Read(stream);
 }
 
-void GETCoboFrame::SetFrame(Int_t index, GETBasicFrame *frame) {
+void GETCoboFrame::ReadFrame(Int_t index, ifstream &stream) {
   fFrame[index].Clear();
-  fFrame[index] = *frame;
+  fFrame[index].Read(stream);
 }
 
         Int_t  GETCoboFrame::GetNumFrames()        { return fNumFrames; }
