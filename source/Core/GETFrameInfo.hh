@@ -5,6 +5,8 @@
 
 class GETFrameInfo : public TObject {
   public:
+    GETFrameInfo();
+
             void  SetDataID(UInt_t value);
             void  SetEventID(UInt_t value);
             void  SetEventTime(ULong64_t value);
@@ -20,11 +22,14 @@ class GETFrameInfo : public TObject {
        ULong64_t  GetStartByte();
        ULong64_t  GetEndByte();
     GETFrameInfo *GetNextInfo();
+          UInt_t  GetNumFrames();
 
           Bool_t  IsFill();
             void  Clear(Option_t * = "");
 
             void  Print();
+
+            void  Copy(GETFrameInfo *frameInfo);
 
   private:
           UInt_t  fDataID;
