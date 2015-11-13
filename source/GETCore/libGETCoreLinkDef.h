@@ -6,6 +6,5 @@
 
 #pragma link C++ class GETDecoder+;
 #pragma link C++ class GETFrameInfo+;
-#pragma link C++ class GETFileChecker+;
 
 #endif
