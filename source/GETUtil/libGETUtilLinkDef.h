@@ -5,5 +5,6 @@
 #pragma link off all functions;
 
 #pragma link C++ class GETFileChecker+;
+#pragma link C++ class GETMath+;
 
 #endif
