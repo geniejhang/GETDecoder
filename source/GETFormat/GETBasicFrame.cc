@@ -4,19 +4,14 @@ GETBasicFrame::GETBasicFrame() {
   Clear();
 }
 
-Int_t *GETBasicFrame::GetRawADC(Int_t agetIdx, Int_t chIdx) { return fRawADC + GetIndex(agetIdx, chIdx, 0); }
-
-    void  GETBasicFrame::SetADC(Int_t agetIdx, Int_t chIdx, Int_t tbIdx, Double_t adc) { fADC[GetIndex(agetIdx, chIdx, tbIdx)] = adc; }
-    void  GETBasicFrame::SetADC(Int_t agetIdx, Int_t chIdx, Double_t *adc, Int_t tbsSize) { memcpy(fADC + GetIndex(agetIdx, chIdx, 0), adc, sizeof(Double_t)*tbsSize); }
-Double_t *GETBasicFrame::GetADC(Int_t agetIdx, Int_t chIdx) { return fADC + GetIndex(agetIdx, chIdx, 0); }
+Int_t *GETBasicFrame::GetSample(Int_t agetIdx, Int_t chIdx) { return fSample + GetIndex(agetIdx, chIdx, 0); }
 
 Int_t GETBasicFrame::GetFrameSkip() { return GetFrameSize() - GETBASICFRAMEHEADERSIZE - GetHeaderSkip() - GetItemSize()*GetNItems(); }
 
 void GETBasicFrame::Clear(Option_t *) {
   GETBasicFrameHeader::Clear();
 
-  memset(fRawADC, 0, sizeof(Int_t)*4*68*512);
-  memset(fADC,    0, sizeof(Int_t)*4*68*512);
+  memset(fSample, 0, sizeof(Int_t)*4*68*512);
 }
 
 void GETBasicFrame::Read(ifstream &stream) {
@@ -34,9 +29,9 @@ void GETBasicFrame::Read(ifstream &stream) {
       UShort_t agetIdx = ((item & 0xc0000000) >> 30);
       UShort_t   chIdx = ((item & 0x3f800000) >> 23);
       UShort_t   tbIdx = ((item & 0x007fc000) >> 14);
-      UShort_t  rawADC =  (item & 0x00000fff);         
+      UShort_t  sample =  (item & 0x00000fff);         
 
-      fRawADC[GetIndex(agetIdx, chIdx, tbIdx)] = rawADC; 
+      fSample[GetIndex(agetIdx, chIdx, tbIdx)] = sample; 
     }
   } else if (GetFrameType() == GETFRAMEBASICTYPE2) {
     uint8_t data[2];
@@ -48,9 +43,9 @@ void GETBasicFrame::Read(ifstream &stream) {
       UShort_t agetIdx = ((item & 0xc000) >> 14);
       UShort_t   chIdx = ((iItem/8)*2 + iItem%2)%68;
       UShort_t   tbIdx = iItem/(68*4);
-      UShort_t  rawADC = item & 0x0fff;
+      UShort_t  sample = item & 0x0fff;
 
-      fRawADC[GetIndex(agetIdx, chIdx, tbIdx)] = rawADC; 
+      fSample[GetIndex(agetIdx, chIdx, tbIdx)] = sample; 
     }
   }
 
