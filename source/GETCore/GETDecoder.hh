@@ -66,7 +66,6 @@ class GETDecoder : public TObject
     //! Return the number of time buckets.
     Int_t GetNumTbs();
     //! Return GETPlot object pointer if there exists. If not, create a new one and return it.
-//    GETPlot *GetGETPlot();
     //! Return the frame type. This is used when drawing merged frame.
     EFrameType GetFrameType();
 
@@ -77,11 +76,12 @@ class GETDecoder : public TObject
     GETLayeredFrame *GetLayeredFrame(Int_t frameID = -1);
 
     void PrintFrameInfo(Int_t frameID = -1);
+    void PrintCoboFrameInfo(Int_t frameID = -1);
 
     //! Set the file for writing frame
-//    Bool_t SetWriteFile(TString filename, Bool_t overwrite = kFALSE);
+    Bool_t SetWriteFile(TString filename, Bool_t overwrite = kFALSE);
     //! Write current frame
-//    void WriteFrame();
+    void WriteFrame();
 
   private:
     //! Initialize variables used in the class.
@@ -118,8 +118,6 @@ class GETDecoder : public TObject
     Int_t fFrameInfoIdx;                ///< Current frame index
     Int_t fCoboFrameInfoIdx;            ///< Current cobo frame index
     Int_t fTargetFrameInfoIdx;          ///< Target frame or cobo frame index to return
-
-//    GETPlot *fGETPlot;     /// GETPlot pointer
 
     Char_t *fBuffer;       /// Buffer for writing frame
     TString fWriteFile;    /// File for writing frames

@@ -23,8 +23,6 @@
 #include "GETFileChecker.hh"
 
 #define DEBUG
-#define MESSAGE_ORIGIN __FILE__,__FUNC__,__LINE__
-#define LOG(DEBUG) cout
 
 ClassImp(GETDecoder);
 
@@ -73,8 +71,6 @@ void GETDecoder::Initialize()
   fFrameInfoIdx = 0;
   fCoboFrameInfoIdx = 0;
   fTargetFrameInfoIdx = -1;
-
-//  fGETPlot = 0;
 
   fBuffer = NULL;
   fWriteFile = "";
@@ -230,7 +226,6 @@ TString GETDecoder::GetDataName(Int_t index)
 }
 
 Int_t GETDecoder::GetNumTbs() { return fNumTbs; }
-//GETPlot *GETDecoder::GetGETPlot() { if (!fGETPlot) fGETPlot = new GETPlot(this); return fGETPlot; }
 GETDecoder::EFrameType GETDecoder::GetFrameType() { return fFrameType; }
 
 Int_t GETDecoder::GetNumFrames() {
@@ -467,7 +462,24 @@ void GETDecoder::PrintFrameInfo(Int_t frameID) {
     ((GETFrameInfo *) fFrameInfoArray -> At(frameID)) -> Print();
 }
 
-/*
+void GETDecoder::PrintCoboFrameInfo(Int_t frameID) {
+  if (frameID == -1) {
+    for (Int_t iEntry = 0; iEntry < fCoboFrameInfoArray -> GetEntriesFast(); iEntry++) {
+      GETFrameInfo *frameInfo = (GETFrameInfo *) fCoboFrameInfoArray -> At(iEntry);
+      do {
+        frameInfo -> Print();
+        frameInfo = frameInfo -> GetNextInfo();
+      } while (frameInfo);
+    }
+  } else {
+    GETFrameInfo *frameInfo = (GETFrameInfo *) fCoboFrameInfoArray -> At(frameID);
+    do {
+      frameInfo -> Print();
+      frameInfo = frameInfo -> GetNextInfo();
+    } while (frameInfo);
+  }
+}
+
 Bool_t GETDecoder::SetWriteFile(TString filename, Bool_t overwrite)
 {
   fWriteFile = GETFileChecker::CheckFile(filename);
@@ -487,6 +499,26 @@ Bool_t GETDecoder::SetWriteFile(TString filename, Bool_t overwrite)
   if (fBuffer == NULL)
     fBuffer = new Char_t[14000000];
 
+  if (fFrameType == kCobo) {
+    Int_t currentDataID = fCurrentDataID;
+    ULong64_t currentPosition = fData.tellg();
+    if (fCurrentDataID != 0)
+      SetData(0);
+      
+    std::ofstream outFile(fWriteFile.Data(), std::ios::ate|std::ios::binary|std::ios::app);
+    fData.seekg(0);
+    fData.read(fBuffer, fTopologyFrame -> GetFrameSize());
+    outFile.write(fBuffer, fTopologyFrame -> GetFrameSize());
+    outFile.close();
+
+    if (currentDataID != 0)
+      SetData(currentDataID);
+
+    fData.seekg(currentPosition);
+
+    std::cout << "== [GETDecoder] Topology frame is written!" << std::endl;
+  }
+
   return kTRUE;
 }
 
@@ -498,24 +530,26 @@ void GETDecoder::WriteFrame()
     return;
   }
 
-  if (fFrame == NULL) {
-    std::cout << "== [GETDecoder] No frame loaded! Read a frame before write." << std::endl;
-
-    return;
-  }
-
   std::ofstream outFile(fWriteFile.Data(), std::ios::ate|std::ios::binary|std::ios::app);
-  if (GetFrameType() == GETDecoder::kNormal) {
-    fData.seekg((ULong64_t) fData.tellg() - fFrameSize);
-    fData.read(fBuffer, fFrameSize);
-    outFile.write(fBuffer, fFrameSize);
-  } else {
-    ULong64_t currentPosition = fData.tellg();
-    fData.seekg(fMergedFrameStartPoint);
-    fData.read(fBuffer, fFrameSize);
-    outFile.write(fBuffer, fFrameSize);
-    fData.seekg(currentPosition);
+  switch (fFrameType) {
+    case kCobo:
+      fCoboFrameInfo = (GETFrameInfo *) fCoboFrameInfoArray -> At(fTargetFrameInfoIdx);
+      do {
+        ULong64_t frameSize = fCoboFrameInfo -> GetEndByte() - fCoboFrameInfo -> GetStartByte();
+        fData.seekg(fCoboFrameInfo -> GetStartByte());
+        fData.read(fBuffer, frameSize);
+        outFile.write(fBuffer, frameSize);
+        fCoboFrameInfo = fCoboFrameInfo -> GetNextInfo();
+      } while (fCoboFrameInfo);
+      break;
+
+    default:
+      fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> At(fTargetFrameInfoIdx);
+      ULong64_t frameSize = fFrameInfo -> GetEndByte() - fFrameInfo -> GetStartByte();
+      fData.seekg(fFrameInfo -> GetStartByte());
+      fData.read(fBuffer, frameSize);
+      outFile.write(fBuffer, frameSize);
+      break;
   }
   outFile.close();
 }
-*/
