@@ -90,6 +90,8 @@ class GETDecoder
     void BackupCurrentState();
     void RestorePreviousState();
 
+    void SetPseudoTopologyFrame(Int_t asadMask, Bool_t check = kFALSE);
+
   private:
     //! Initialize variables used in the class.
     void Initialize();
