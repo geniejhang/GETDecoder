@@ -6,8 +6,12 @@
 //    Genie Jhang ( geniejhang@majimak.com )
 //  
 //  Log:
+//    - 2016. 03. 23
+//      MUTANT frame added
 //    - 2015. 11. 09
 //      Start writing new! class
+//    - 2013. 09. 23
+//      Start writing class
 // =================================================
 
 #ifndef GETDECODER
@@ -21,6 +25,7 @@
 #include "GETBasicFrame.hh"
 #include "GETCoboFrame.hh"
 #include "GETLayeredFrame.hh"
+#include "GETMutantFrame.hh"
 
 #include "GETFrameInfo.hh"
 
@@ -45,7 +50,7 @@ class GETDecoder
     void Clear(); ///< Clear data information
 
     //! Frame type enumerator
-    enum EFrameType { kBasic, kCobo, kMergedID, kMergedTime };
+    enum EFrameType { kBasic, kCobo, kMergedID, kMergedTime, kMutant };
 
     //! Setting the number of time buckets.
     void SetNumTbs(Int_t value = 512);
@@ -76,6 +81,7 @@ class GETDecoder
       GETBasicFrame *GetBasicFrame(Int_t frameID = -1);
        GETCoboFrame *GetCoboFrame(Int_t frameID = -1);
     GETLayeredFrame *GetLayeredFrame(Int_t frameID = -1);
+     GETMutantFrame *GetMutantFrame(Int_t frameID = -1);
 
     void PrintFrameInfo(Int_t frameID = -1);
     void PrintCoboFrameInfo(Int_t frameID = -1);
@@ -102,6 +108,7 @@ class GETDecoder
        GETBasicFrame *fBasicFrame;
         GETCoboFrame *fCoboFrame;
      GETLayeredFrame *fLayeredFrame;
+      GETMutantFrame *fMutantFrame;
 
     TClonesArray *fFrameInfoArray;
     TClonesArray *fCoboFrameInfoArray;
