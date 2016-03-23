@@ -93,7 +93,7 @@ void GETMutantFrame::Print() {
   cout << "       triggerInfo: " << hex << GetTriggerInfo() << dec << " (Below are binary)" << endl;
   cout << "                    -        Master: " << ((GetTriggerInfo()&0xc000 >> 15) == 0) << endl;
   cout << "                    -       Slave 1: " << ((GetTriggerInfo()&0xc000 >> 15) == 1) << endl;
-  cout << "                    -       Slave 1: " << ((GetTriggerInfo()&0xc000 >> 15) == 2) << endl;
+  cout << "                    -       Slave 2: " << ((GetTriggerInfo()&0xc000 >> 15) == 2) << endl;
   cout << "                    -  L1A_LOW_TRIG: " << (GetTriggerInfo()&0x1) << endl;
   cout << "                    - L1A_HIGH_TRIG: " << (GetTriggerInfo()&0x2 >> 1) << endl;
   cout << "                    -  L1B_LOW_TRIG: " << (GetTriggerInfo()&0x4 >> 2) << endl;
