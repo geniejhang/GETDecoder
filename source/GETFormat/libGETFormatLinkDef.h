@@ -12,5 +12,6 @@
 #pragma link C++ class GETBasicFrame+;
 #pragma link C++ class GETCoboFrame+;
 #pragma link C++ class GETLayeredFrame+;
+#pragma link C++ class GETMutantFrame+;
 
 #endif
