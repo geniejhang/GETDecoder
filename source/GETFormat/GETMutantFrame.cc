@@ -90,7 +90,7 @@ void GETMutantFrame::Print() {
   cout << "          revision: " << GetRevision() << endl;
   cout << "         timestamp: " << GetTimestamp() << dec << " (" << GetTimestamp() << ")" << endl;
   cout << "       eventNumber: " << GetEventNumber() << endl;
-  cout << "       triggerInfo: " << GetTriggerInfo() << endl;
+  cout << "       triggerInfo: " << hex << GetTriggerInfo() << dec << " (Below are binary)" << endl;
   cout << "                    -        Master: " << ((GetTriggerInfo()&0xc000 >> 15) == 0) << endl;
   cout << "                    -       Slave 1: " << ((GetTriggerInfo()&0xc000 >> 15) == 1) << endl;
   cout << "                    -       Slave 1: " << ((GetTriggerInfo()&0xc000 >> 15) == 2) << endl;
@@ -103,7 +103,7 @@ void GETMutantFrame::Print() {
   cout << "                    -          L2EN: " << (GetTriggerInfo()&0x40 >> 6) << endl;
   cout << "                    -           L2W: " << (GetTriggerInfo()&0x80 >> 7) << endl;
   cout << "                    -         L0/L1: " << (GetTriggerInfo()&0x100 >> 8) << endl;
-  cout << "                    -         L1SEL: " << (GetTriggerInfo()&0x400 >> 10) << (GetTriggerInfo()&0x200 >> 9) << "(binary)" << endl;
+  cout << "                    -         L1SEL: " << (GetTriggerInfo()&0x400 >> 10) << (GetTriggerInfo()&0x200 >> 9) << " (binary)" << endl;
   cout << "                    -           TPD: " << (GetTriggerInfo()&0x800 >> 11) << endl;
   cout << "                    -           HER: " << (GetTriggerInfo()&0x1000 >> 12) << endl;
   cout << "    multiplicity A: " << GetMultiplicity(0) << endl;
