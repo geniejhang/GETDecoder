@@ -221,43 +221,40 @@ Bool_t GETDecoder::SetData(Int_t index)
   if (!fIsDataInfo) {
     fHeaderBase -> Read(fData, kTRUE);
 
-    if (fHeaderBase -> IsBlob() && fHeaderBase -> GetFrameType() == 0)
-      fTopologyFrame -> Read(fData);
-
     std::cout << "== [GETDecoder] Frame Type: ";
-    if (fTopologyFrame -> IsBlob() && fHeaderBase -> GetFrameType() == 0) {
-      fFrameType = kCobo;
-      std::cout << "Cobo frame (Max. 4 frames)" << std::endl;
-    } else {
-      fHeaderBase -> Read(fData, kTRUE);
-      switch (fHeaderBase -> GetFrameType()) {
-        case GETFRAMEMERGEDBYID:
-          fFrameType = kMergedID;
-          std::cout << "Event ID merged frame" << std::endl;
-          break;
+    switch (fHeaderBase -> GetFrameType()) {
+      case GETFRAMETOPOLOGY:
+        fFrameType = kCobo;
+        fTopologyFrame -> Read(fData);
+        std::cout << "Cobo frame (Max. 4 frames)" << std::endl;
+        break;
 
-        case GETFRAMEMERGEDBYTIME:
-          fFrameType = kMergedTime;
-          std::cout << "Event time merged frame" << std::endl;
-          break;
+      case GETFRAMEMERGEDBYID:
+        fFrameType = kMergedID;
+        std::cout << "Event ID merged frame" << std::endl;
+        break;
 
-        case GETFRAMEMUTANT:
-          fFrameType = kMutant;
-          std::cout << "MUTANT frame" << std::endl;
-          break;
+      case GETFRAMEMERGEDBYTIME:
+        fFrameType = kMergedTime;
+        std::cout << "Event time merged frame" << std::endl;
+        break;
 
-        default:
-          fFrameType = kBasic;
-          std::cout << "Basic frame" << std::endl;
-          break;
-      }
+      case GETFRAMEMUTANT:
+        fFrameType = kMutant;
+        std::cout << "MUTANT frame" << std::endl;
+        break;
+
+      default:
+        fFrameType = kBasic;
+        std::cout << "Basic frame" << std::endl;
+        break;
     }
 
     fIsDataInfo = kTRUE;
   } else {
     fHeaderBase -> Read(fData, kTRUE);
 
-    if (fHeaderBase -> IsBlob() && fHeaderBase -> GetFrameType() == 0)
+    if (fHeaderBase -> GetFrameType() == GETFRAMETOPOLOGY)
       fTopologyFrame -> Read(fData);
   }
 
