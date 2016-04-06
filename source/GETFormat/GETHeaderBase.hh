@@ -3,7 +3,7 @@
 
 #define GETHEADERBASESIZE         8
 
-#define GETFRAMETOPOLOGY        0x0
+#define GETFRAMETOPOLOGY        0x7
 #define GETFRAMEBASICTYPE1      0x1
 #define GETFRAMEBASICTYPE2      0x2
 #define GETFRAMEMERGEDBYID   0xff01
