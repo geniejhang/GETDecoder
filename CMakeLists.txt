@@ -29,6 +29,7 @@ ${CMAKE_SOURCE_DIR}/source/GETFormat/GETHeaderBase.hh
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETLayerHeader.hh
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETLayeredFrame.hh
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETTopologyFrame.hh
+${CMAKE_SOURCE_DIR}/source/GETFormat/GETMutantFrame.hh
 LINKDEF ${CMAKE_SOURCE_DIR}/source/GETFormat/libGETFormatLinkDef.h)
 
 ROOT_GENERATE_DICTIONARY(G__GETUtilDict 
@@ -50,6 +51,7 @@ ${CMAKE_SOURCE_DIR}/source/GETFormat/GETHeaderBase.cc
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETLayerHeader.cc
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETLayeredFrame.cc
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETTopologyFrame.cc
+${CMAKE_SOURCE_DIR}/source/GETFormat/GETMutantFrame.cc
 G__GETFormatDict.cxx
 
 ${CMAKE_SOURCE_DIR}/source/GETUtil/GETFileChecker.cc
