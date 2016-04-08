@@ -12,6 +12,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <sstream>
 #include <cmath>
 #include <arpa/inet.h>
 
@@ -676,4 +677,14 @@ void GETDecoder::RestorePreviousState() {
     SetData(fPrevDataID);
 
   fData.seekg(fPrevPosition);
+}
+
+
+void GETDecoder::SetPseudoTopologyFrame(Int_t asadMask, Bool_t check) {
+  Char_t bytes[] = { 0x40, 0x00, 0x00, 0x0c, 0x00, 0x00, 0x07, 0x00, 0x00, (Char_t)(asadMask&0xf), 0x00, 0x00 };
+  std::stringstream topology(std::string(std::begin(bytes), std::end(bytes)));
+
+  fTopologyFrame -> Read(*((ifstream *) &topology));
+  if (check)
+    fTopologyFrame -> Print();
 }
