@@ -19,6 +19,8 @@
 #include <sstream>
 #include <cmath>
 #include <arpa/inet.h>
+#include <chrono>
+#include <thread>
 
 #include "TString.h"
 
@@ -45,17 +47,13 @@ GETDecoder::GETDecoder()
 }
 
 GETDecoder::GETDecoder(TString filename)
-:fFrameInfoArray(NULL), fCoboFrameInfoArray(NULL), fFrameInfo(NULL), fCoboFrameInfo(NULL),
- fHeaderBase(NULL), fBasicFrameHeader(NULL), fLayerHeader(NULL),
- fTopologyFrame(NULL), fBasicFrame(NULL), fCoboFrame(NULL), fLayeredFrame(NULL),
- fMutantFrame(NULL)
+:GETDecoder()
 {
   /**
     * Automatically add the rawdata file to the list
     * and set the file to read.
    **/
 
-  Initialize();
   AddData(filename);
   SetData(0);
 }
@@ -115,6 +113,9 @@ void GETDecoder::Initialize()
 
   fPrevDataID = 0;
   fPrevPosition = 0;
+
+  fIsOnline = kFALSE;
+  fEndLoop = kFALSE;
 }
 
 void GETDecoder::Clear() {
@@ -195,9 +196,25 @@ Bool_t GETDecoder::SetData(Int_t index)
   }
 
   if (index >= fDataList.size()) {
-    std::cout << "== [GETDecoder] End of data list!" << std::endl;
+    if (!fIsOnline) {
+      std::cout << "== [GETDecoder] End of data list!" << std::endl;
 
-    return kFALSE;
+      return kFALSE;
+    } else {
+      while (kTRUE) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        if (fEndLoop)
+          return kFALSE;
+
+        TString nextFile = fDataList.back() + "." + fDataList.size();
+        if (GETFileChecker::CheckFile(nextFile, kFALSE)) {
+          fDataList.push_back(nextFile);
+
+          break;
+        }
+      }
+    }
   }
 
   if (fData.is_open())
@@ -265,7 +282,15 @@ Bool_t GETDecoder::SetData(Int_t index)
 }
 
 void GETDecoder::SetDiscontinuousData(Bool_t value) { fIsContinuousData = !value; }
-Bool_t GETDecoder::NextData() { if (fIsContinuousData) return SetData(fCurrentDataID + 1); else return kFALSE; }
+
+Bool_t GETDecoder::NextData()
+{
+  if (fIsContinuousData)
+    return SetData(fCurrentDataID + 1);
+  else
+    return kFALSE;
+}
+
 void GETDecoder::SetPositivePolarity(Bool_t value) { fIsPositivePolarity = value; }
 
 void GETDecoder::ShowList()
@@ -373,8 +398,6 @@ GETBasicFrame *GETDecoder::GetBasicFrame(Int_t frameID)
 
     CheckEndOfData();
   }
-
-//  return GetBasicFrame(fTargetFrameInfoIdx);
 }
 
 GETCoboFrame *GETDecoder::GetCoboFrame(Int_t frameID)
@@ -475,8 +498,6 @@ GETCoboFrame *GETDecoder::GetCoboFrame(Int_t frameID)
       }
     }
   }
-
-//  return GetCoboFrame(fTargetFrameInfoIdx);
 }
 
 GETLayeredFrame *GETDecoder::GetLayeredFrame(Int_t frameID)
@@ -551,8 +572,6 @@ GETLayeredFrame *GETDecoder::GetLayeredFrame(Int_t frameID)
 
     CheckEndOfData();
   }
-
-//  return GetLayeredFrame(fTargetFrameInfoIdx);
 }
 
 GETMutantFrame *GETDecoder::GetMutantFrame(Int_t frameID)
@@ -723,6 +742,18 @@ void GETDecoder::WriteFrame()
 
 void GETDecoder::CheckEndOfData() {
   if (!fIsMetaData && fFrameInfo -> GetEndByte() == fDataSize)
+    if (fIsOnline) {
+      ifstream dataTest(fDataList.at(fFrameInfo -> GetDataID()).Data(), std::ios::ate|std::ios::binary);
+      Long64_t testDataSize = dataTest.tellg();
+      dataTest.close();
+
+      if (fFrameInfo -> GetEndByte() < testDataSize) {
+        SetData(fFrameInfo -> GetDataID());
+        fData.seekg(fFrameInfo -> GetEndByte());
+        return;
+      }
+    }
+
     if (!NextData() && !fIsDoneAnalyzing) {
 
 #ifdef DEBUG
@@ -751,7 +782,6 @@ void GETDecoder::RestorePreviousState() {
   fData.seekg(fPrevPosition);
 }
 
-
 void GETDecoder::SetPseudoTopologyFrame(Int_t asadMask, Bool_t check) {
   Char_t bytes[] = { 0x40, 0x00, 0x00, 0x0c, 0x00, 0x00, 0x07, 0x00, 0x00, (Char_t)(asadMask&0xf), 0x00, 0x00 };
   std::stringstream topology(std::string(std::begin(bytes), std::end(bytes)));
@@ -760,3 +790,6 @@ void GETDecoder::SetPseudoTopologyFrame(Int_t asadMask, Bool_t check) {
   if (check)
     fTopologyFrame -> Print();
 }
+
+void GETDecoder::SetOnline(Bool_t value)  { fIsOnline = value; }
+void GETDecoder::SetEndLoop(Bool_t value) { fEndLoop = value; }
