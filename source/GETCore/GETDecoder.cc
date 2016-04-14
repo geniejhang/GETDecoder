@@ -762,20 +762,20 @@ void GETDecoder::SetPseudoTopologyFrame(Int_t asadMask, Bool_t check) {
 void GETDecoder::SaveMetaData(TString filename, Int_t coboIdx) {
   if (filename.IsNull()) {
     TObjArray *split = fDataList.at(0).Tokenize("/");
-    filename = Form("%s%s.root", ((TObjString *) split -> Last()) -> String().Data(), (coboIdx == -1 ? "" : Form("%d", coboIdx)));
+    filename = Form("%s.meta%s.root", ((TObjString *) split -> Last()) -> String().Data(), (coboIdx == -1 ? "" : Form(".C%d", coboIdx)));
     delete split;
   }
 
   switch (fFrameType) {
     case kCobo:
-      GetCoboFrame(1000000);
+      GetCoboFrame(10000000);
       break;
     case kMergedID:
     case kMergedTime:
-      GetLayeredFrame(1000000);
+      GetLayeredFrame(10000000);
       break;
     case kBasic:
-      GetBasicFrame(1000000);
+      GetBasicFrame(10000000);
       break;
     default:
       std::cout << "== [GETDecoder] Nothing to store!" << std::endl;
@@ -783,9 +783,29 @@ void GETDecoder::SaveMetaData(TString filename, Int_t coboIdx) {
   }
 
   TFile *metaFile = new TFile(filename, "recreate");
+
+  UInt_t dataID = 0, eventID = 0, deltaT = 0;
+  ULong64_t eventTime = 0, startByte = 0, endByte = 0;
   TTree *metaTree = new TTree("MetaData", "Meta data tree");
-  metaTree -> Branch("FrameInfoArray", "TClonesArray", fFrameInfoArray);
-  metaTree -> Fill();
+  metaTree -> Branch("dataID", &dataID);
+  metaTree -> Branch("eventID", &eventID);
+  metaTree -> Branch("eventTime", &eventTime);
+  metaTree -> Branch("deltaT", &deltaT);
+  metaTree -> Branch("startByte", &startByte);
+  metaTree -> Branch("endByte", &endByte);
+
+  UInt_t numEntries = fFrameInfoArray -> GetEntries();
+  for (UInt_t iEntry = 0; iEntry < numEntries; iEntry++) {
+    GETFrameInfo *frameInfo = (GETFrameInfo *) fFrameInfoArray -> At(iEntry);
+    dataID = frameInfo -> GetDataID();
+    eventID = frameInfo -> GetEventID();
+    eventTime = frameInfo -> GetEventTime();
+    deltaT = frameInfo -> GetDeltaT();
+    startByte = frameInfo -> GetStartByte();
+    endByte = frameInfo -> GetEndByte();
+
+    metaTree -> Fill();
+  }
   metaFile -> Write();
 
   delete metaTree;
@@ -794,21 +814,36 @@ void GETDecoder::SaveMetaData(TString filename, Int_t coboIdx) {
 
 void GETDecoder::LoadMetaData(TString filename) {
   TFile *metaFile = new TFile(filename);
-  TClonesArray *frameInfoArray = nullptr;
 
+  UInt_t dataID = 0, eventID = 0, deltaT = 0;
+  ULong64_t eventTime = 0, startByte = 0, endByte = 0;
   TTree *metaTree = (TTree *) metaFile -> Get("MetaData");
-  metaTree -> SetBranchAddress("FrameInfoArray", &frameInfoArray);
-  metaTree -> GetEntry(0);
+  metaTree -> SetBranchAddress("dataID", &dataID);
+  metaTree -> SetBranchAddress("eventID", &eventID);
+  metaTree -> SetBranchAddress("eventTime", &eventTime);
+  metaTree -> SetBranchAddress("deltaT", &deltaT);
+  metaTree -> SetBranchAddress("startByte", &startByte);
+  metaTree -> SetBranchAddress("endByte", &endByte);
 
   fFrameInfoArray -> Clear("C");
-  fFrameInfoArray -> AbsorbObjects(frameInfoArray);
+  UInt_t numEntries = metaTree -> GetEntries();
+  for (Int_t iEntry = 0; iEntry < numEntries; iEntry++) {
+    metaTree -> GetEntry(iEntry);
+    fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> ConstructedAt(iEntry);
+    fFrameInfo -> Clear();
+    fFrameInfo -> SetDataID(dataID);
+    fFrameInfo -> SetEventID(eventID);
+    fFrameInfo -> SetEventTime(eventTime);
+    fFrameInfo -> SetDeltaT(deltaT);
+    fFrameInfo -> SetStartByte(startByte);
+    fFrameInfo -> SetEndByte(endByte);
+  }
 
   delete metaFile;
 
   if (fFrameType == kCobo) {
     fCoboFrameInfoArray -> Clear("C");
-    UInt_t coboFrameInfoIdx = 0;
-    UInt_t numEntries = fFrameInfoArray -> GetEntriesFast();
+    Int_t coboFrameInfoIdx = 0;
     for (UInt_t iEntry = 0; iEntry < numEntries; iEntry++) {
       fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> At(iEntry);
       fCoboFrameInfo = (GETFrameInfo *) fCoboFrameInfoArray -> ConstructedAt(coboFrameInfoIdx);
@@ -837,4 +872,7 @@ void GETDecoder::LoadMetaData(TString filename) {
         coboFrameInfoIdx++;
     }
   }
+
+  fIsDoneAnalyzing = kTRUE;
+  fIsMetaData = kTRUE;
 }
