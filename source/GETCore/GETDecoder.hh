@@ -91,16 +91,20 @@ class GETDecoder
     //! Write current frame
     void WriteFrame();
 
-    void CheckEndOfData();
-
-    void BackupCurrentState();
-    void RestorePreviousState();
-
-    void SetPseudoTopologyFrame(Int_t asadMask, Bool_t check = kFALSE);
-
   private:
     //! Initialize variables used in the class.
     void Initialize();
+
+    //! Check the end of file
+    void CheckEndOfData();
+
+    //! Store current frame position
+    void BackupCurrentState();
+    //! Restore to the previous frame position
+    void RestorePreviousState();
+
+    //! Set topology frame information manually
+    void SetPseudoTopologyFrame(Int_t asadMask, Bool_t check = kFALSE);
 
           GETHeaderBase *fHeaderBase;
     GETBasicFrameHeader *fBasicFrameHeader;
