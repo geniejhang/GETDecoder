@@ -21,6 +21,10 @@
 #include <arpa/inet.h>
 
 #include "TString.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TObjArray.h"
+#include "TObjString.h"
 
 #include "GETDecoder.hh"
 
@@ -373,8 +377,6 @@ GETBasicFrame *GETDecoder::GetBasicFrame(Int_t frameID)
 
     CheckEndOfData();
   }
-
-//  return GetBasicFrame(fTargetFrameInfoIdx);
 }
 
 GETCoboFrame *GETDecoder::GetCoboFrame(Int_t frameID)
@@ -475,8 +477,6 @@ GETCoboFrame *GETDecoder::GetCoboFrame(Int_t frameID)
       }
     }
   }
-
-//  return GetCoboFrame(fTargetFrameInfoIdx);
 }
 
 GETLayeredFrame *GETDecoder::GetLayeredFrame(Int_t frameID)
@@ -551,8 +551,6 @@ GETLayeredFrame *GETDecoder::GetLayeredFrame(Int_t frameID)
 
     CheckEndOfData();
   }
-
-//  return GetLayeredFrame(fTargetFrameInfoIdx);
 }
 
 GETMutantFrame *GETDecoder::GetMutantFrame(Int_t frameID)
@@ -759,4 +757,84 @@ void GETDecoder::SetPseudoTopologyFrame(Int_t asadMask, Bool_t check) {
   fTopologyFrame -> Read(*((ifstream *) &topology));
   if (check)
     fTopologyFrame -> Print();
+}
+
+void GETDecoder::SaveMetaData(TString filename, Int_t coboIdx) {
+  if (filename.IsNull()) {
+    TObjArray *split = fDataList.at(0).Tokenize("/");
+    filename = Form("%s%s.root", ((TObjString *) split -> Last()) -> String().Data(), (coboIdx == -1 ? "" : Form("%d", coboIdx)));
+    delete split;
+  }
+
+  switch (fFrameType) {
+    case kCobo:
+      GetCoboFrame(1000000);
+      break;
+    case kMergedID:
+    case kMergedTime:
+      GetLayeredFrame(1000000);
+      break;
+    case kBasic:
+      GetBasicFrame(1000000);
+      break;
+    default:
+      std::cout << "== [GETDecoder] Nothing to store!" << std::endl;
+      break;
+  }
+
+  TFile *metaFile = new TFile(filename, "recreate");
+  TTree *metaTree = new TTree("MetaData", "Meta data tree");
+  metaTree -> Branch("FrameInfoArray", "TClonesArray", fFrameInfoArray);
+  metaTree -> Fill();
+  metaFile -> Write();
+
+  delete metaTree;
+  delete metaFile;
+}
+
+void GETDecoder::LoadMetaData(TString filename) {
+  TFile *metaFile = new TFile(filename);
+  TClonesArray *frameInfoArray = nullptr;
+
+  TTree *metaTree = (TTree *) metaFile -> Get("MetaData");
+  metaTree -> SetBranchAddress("FrameInfoArray", &frameInfoArray);
+  metaTree -> GetEntry(0);
+
+  fFrameInfoArray -> Clear("C");
+  fFrameInfoArray -> AbsorbObjects(frameInfoArray);
+
+  delete metaFile;
+
+  if (fFrameType == kCobo) {
+    fCoboFrameInfoArray -> Clear("C");
+    UInt_t coboFrameInfoIdx = 0;
+    UInt_t numEntries = fFrameInfoArray -> GetEntriesFast();
+    for (UInt_t iEntry = 0; iEntry < numEntries; iEntry++) {
+      fFrameInfo = (GETFrameInfo *) fFrameInfoArray -> At(iEntry);
+      fCoboFrameInfo = (GETFrameInfo *) fCoboFrameInfoArray -> ConstructedAt(coboFrameInfoIdx);
+
+      if (fCoboFrameInfo -> GetNumFrames() == 0)
+        fCoboFrameInfo -> Copy(fFrameInfo);
+      else if (fCoboFrameInfo -> GetEventID() == fFrameInfo -> GetEventID())
+        fCoboFrameInfo -> SetNextInfo(fFrameInfo); 
+      else {
+        Int_t iChecker = (coboFrameInfoIdx - 10 < 0 ? 0 : coboFrameInfoIdx - 10);
+        while (GETFrameInfo *checkCoboFrameInfo = (GETFrameInfo *) fCoboFrameInfoArray -> ConstructedAt(iChecker)) {
+          if (checkCoboFrameInfo -> IsFill()) {
+            if (checkCoboFrameInfo -> GetEventID() == fFrameInfo -> GetEventID()) {
+              checkCoboFrameInfo -> SetNextInfo(fFrameInfo); 
+              break;
+            } else
+              iChecker++;
+          } else {
+            checkCoboFrameInfo -> Copy(fFrameInfo);
+            break;
+          }
+        }
+      }
+
+      if (fCoboFrameInfo -> GetNumFrames() == fTopologyFrame -> GetAsadMask().count())
+        coboFrameInfoIdx++;
+    }
+  }
 }
