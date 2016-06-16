@@ -157,8 +157,10 @@ void GETDecoder::Clear() {
     std::cout << "== [GETDecoder] Discontinuous data set is set. Leave data list intact!" << std::endl;
 #endif
 
-    fDataList.clear();
+  return;
   }
+  
+  fDataList.clear();
 }
 
 void GETDecoder::SetNumTbs(Int_t value) { fNumTbs = value; } 
