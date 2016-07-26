@@ -98,6 +98,9 @@ class GETDecoder
     //! Load metadata from ROOT file
     void LoadMetaData(TString filename); 
 
+    //! Set topology frame information manually
+    void SetPseudoTopologyFrame(Int_t asadMask, Bool_t check = kFALSE);
+
   private:
     //! Initialize variables used in the class.
     void Initialize();
@@ -109,9 +112,6 @@ class GETDecoder
     void BackupCurrentState();
     //! Restore to the previous frame position
     void RestorePreviousState();
-
-    //! Set topology frame information manually
-    void SetPseudoTopologyFrame(Int_t asadMask, Bool_t check = kFALSE);
 
           GETHeaderBase *fHeaderBase;
     GETBasicFrameHeader *fBasicFrameHeader;
