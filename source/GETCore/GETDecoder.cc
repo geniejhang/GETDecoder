@@ -785,18 +785,23 @@ void GETDecoder::GoToEnd() {
 }
 
 void GETDecoder::SaveMetaData(Int_t runNo, TString filename, Int_t coboIdx) {
+  TString rootFilename;
   if (filename.IsNull()) {
     TObjArray *split = fDataList.at(0).Tokenize("/");
     filename = Form("metadata/%s.meta%s.root", ((TObjString *) split -> Last()) -> String().Data(), (coboIdx == -1 ? "" : Form(".C%d", coboIdx)));
     delete split;
+
+    gSystem -> Exec(Form("mkdir -p run_%04d/metadata", runNo));
+    rootFilename = Form("run_%04d/%s", runNo, filename.Data());
+  } else {
+    rootFilename = filename;
   }
 
-  gSystem -> Exec(Form("mkdir -p run_%04d/metadata", runNo));
-  TFile *metaFile = new TFile(Form("run_%04d/%s", runNo, filename.Data()), "recreate");
+  TFile *metaFile = new TFile(rootFilename.Data(), "recreate");
 
   UInt_t dataID = 0, eventID = 0, deltaT = 0;
   ULong64_t eventTime = 0, startByte = 0, endByte = 0;
-  TTree *metaTree = new TTree("MetaData", Form("Meta data tree for CoBo %d", coboIdx));
+  TTree *metaTree = new TTree("MetaData", Form("Meta data tree for CoBo %d", (coboIdx == -1 ? 0 : coboIdx)));
   metaTree -> Branch("dataID", &dataID);
   metaTree -> Branch("eventID", &eventID);
   metaTree -> Branch("eventTime", &eventTime);
@@ -822,9 +827,11 @@ void GETDecoder::SaveMetaData(Int_t runNo, TString filename, Int_t coboIdx) {
   delete metaTree;
   delete metaFile;
 
-  std::ofstream listFile(Form("run_%04d/metadataList.txt", runNo), std::ios::app);
-  listFile << filename << endl;
-  listFile.close();
+  if (runNo != -1) {
+    std::ofstream listFile(Form("run_%04d/metadataList.txt", runNo), std::ios::app);
+    listFile << filename << endl;
+    listFile.close();
+  }
 }
 
 void GETDecoder::LoadMetaData(TString filename) {
