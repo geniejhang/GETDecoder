@@ -118,6 +118,7 @@ void GETDecoder::Initialize()
   if (     fMutantFrame == NULL) fMutantFrame = new GETMutantFrame();
   else                           fMutantFrame -> Clear();
 
+  fInitialPosition = 0;
   fPrevDataID = 0;
   fPrevPosition = 0;
 }
@@ -131,6 +132,7 @@ void GETDecoder::Clear() {
 
   fDataSize = 0;
   fCurrentDataID = -1;
+  fInitialPosition = 0;
 
   fFrameInfoIdx = 0;
   fCoboFrameInfoIdx = 0;
@@ -226,6 +228,54 @@ Bool_t GETDecoder::SetData(Int_t index)
   std::cout << "== [GETDecoder] " << filename << " is opened!" << std::endl;
 
   fData.seekg(0);
+
+  std::string startOfFileHeader = "<File_Header><";
+  std::string endofFileHeader   = "</File_Header>";
+  UInt_t sizeOfString = endofFileHeader.size();
+
+  std::string lastString = endofFileHeader;
+  for (UInt_t iChar = 0; iChar < sizeOfString; ++iChar)
+    lastString[iChar] = ' ';
+
+  Bool_t isExistFileHeader = kFALSE;
+  Char_t buffer;
+
+  for (UInt_t iRead = 0; iRead < 100; ++iRead) {
+    fData.read(&buffer, sizeof(Char_t));
+
+    for (UInt_t iChar = 1; iChar < sizeOfString; ++iChar)
+      lastString[iChar-1] = lastString[iChar];
+    lastString[sizeOfString-1] = buffer;
+
+    if (lastString == startOfFileHeader) {
+      isExistFileHeader = kTRUE;
+      break;
+    }
+  }
+
+  if (!isExistFileHeader)
+    fInitialPosition = 0;
+  else {
+    std::cout << "== [GETDecoder] File Header do exist!" << std::endl;
+    for (UInt_t iRead = 0; iRead < 10000; ++iRead) {
+      fData.read(&buffer, sizeof(Char_t));
+
+      for (UInt_t iChar = 1; iChar < sizeOfString; ++iChar)
+        lastString[iChar-1] = lastString[iChar];
+      lastString[sizeOfString-1] = buffer;
+
+      if (lastString == endofFileHeader) {
+        fInitialPosition = fData.tellg();
+        break;
+      }
+    }
+    if (fInitialPosition == 0) {
+      std::cout << "== [GETDecoder] Cannot find end of File Header!" << std::endl;
+      return kFALSE;
+    }
+  }
+
+  fData.seekg(fInitialPosition);
   
   if (!fIsDataInfo) {
     fHeaderBase -> Read(fData, kTRUE);
@@ -667,7 +717,7 @@ Bool_t GETDecoder::SetWriteFile(TString filename, Bool_t overwrite)
       SetData(0);
       
     std::ofstream outFile(fWriteFile.Data(), std::ios::ate|std::ios::binary|std::ios::app);
-    fData.seekg(0);
+    fData.seekg(fInitialPosition);
     fData.read(fBuffer, fTopologyFrame -> GetFrameSize());
     outFile.write(fBuffer, fTopologyFrame -> GetFrameSize());
     outFile.close();
@@ -834,7 +884,7 @@ void GETDecoder::SaveMetaData(Int_t runNo, TString filename, Int_t coboIdx) {
   }
 }
 
-void GETDecoder::LoadMetaData(TString filename) {
+UInt_t GETDecoder::LoadMetaData(TString filename) {
   TFile *metaFile = new TFile(filename);
 
   UInt_t dataID = 0, eventID = 0, deltaT = 0;
@@ -897,4 +947,6 @@ void GETDecoder::LoadMetaData(TString filename) {
 
   fIsDoneAnalyzing = kTRUE;
   fIsMetaData = kTRUE;
+
+  return numEntries;
 }
