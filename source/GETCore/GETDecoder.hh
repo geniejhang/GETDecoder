@@ -95,8 +95,8 @@ class GETDecoder
     void GoToEnd();
     //! Write metadata into ROOT file
     void SaveMetaData(Int_t runNo = -1, TString filename = "", Int_t coboIdx = -1);
-    //! Load metadata from ROOT file
-    void LoadMetaData(TString filename); 
+    //! Load metadata from ROOT file. Return number of entries
+    UInt_t LoadMetaData(TString filename);
 
     //! Set topology frame information manually
     void SetPseudoTopologyFrame(Int_t asadMask, Bool_t check = kFALSE);
@@ -153,6 +153,8 @@ class GETDecoder
 
     Int_t fPrevDataID;        ///< Data ID for going back to original data
     ULong64_t fPrevPosition;  ///< Byte number for going back to original data
+
+    ULong64_t fInitialPosition;  ///< Initial file position just after end of File Header
 
   ClassDef(GETDecoder, 1); /// added for making dictionary by ROOT
 };
