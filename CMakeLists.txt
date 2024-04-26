@@ -21,6 +21,13 @@ ${CMAKE_SOURCE_DIR}/source/GETUtil
 )
 add_definitions(${ROOT_CXX_FLAGS})
 
+ROOT_GENERATE_DICTIONARY(G__FRIBDAQFormatDict 
+${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingItemHeader.hh
+${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingItemBodyHeader.hh
+${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingStateChangeItem.hh
+${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingPhysicsEventItem.hh
+LINKDEF ${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/libFRIBDAQFormatLinkDef.h)
+
 ROOT_GENERATE_DICTIONARY(G__GETFormatDict 
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETBasicFrame.hh
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETBasicFrameHeader.hh
@@ -44,6 +51,12 @@ LINKDEF ${CMAKE_SOURCE_DIR}/source/GETCore/libGETCoreLinkDef.h)
 
 #---Create a shared library with geneated dictionary
 add_library(GETDecoder SHARED
+${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingItemHeader.cc
+${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingItemBodyHeader.cc
+${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingStateChangeItem.cc
+${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingPhysicsEventItem.cc
+G__FRIBDAQFormatDict.cxx
+
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETBasicFrame.cc
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETBasicFrameHeader.cc
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETCoboFrame.cc
