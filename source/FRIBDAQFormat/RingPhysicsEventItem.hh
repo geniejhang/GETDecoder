@@ -9,7 +9,7 @@ class RingPhysicsEventItem : public RingItemBodyHeader {
   public:
     RingPhysicsEventItem();
 
-    GETBasicFrame GetBasicFrame();
+    GETBasicFrame GetGETBasicFrame();
 
     void Clear(Option_t * = "");
     void Read(ifstream &file, Bool_t rewind = kFALSE);
