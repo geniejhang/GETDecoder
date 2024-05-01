@@ -7,7 +7,7 @@ RingPhysicsEventItem::RingPhysicsEventItem() {
   Clear();
 }
 
-GETBasicFrame RingPhysicsEventItem::GetGETBasicFrame() { return fGETBasicFrame; }
+GETBasicFrame *RingPhysicsEventItem::GetGETBasicFrame() { return &fGETBasicFrame; }
 
 void RingPhysicsEventItem::Clear(Option_t *) {
 }
