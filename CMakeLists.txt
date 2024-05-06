@@ -22,14 +22,12 @@ ${CMAKE_SOURCE_DIR}/source/GETUtil
 )
 add_definitions(${ROOT_CXX_FLAGS})
 
-ROOT_GENERATE_DICTIONARY(G__FRIBDAQFormat
+ROOT_GENERATE_DICTIONARY(G__GETDecoder
 ${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingItemHeader.hh
 ${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingItemBodyHeader.hh
 ${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingStateChangeItem.hh
 ${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingPhysicsEventItem.hh
-LINKDEF ${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/libFRIBDAQFormatLinkDef.h)
 
-ROOT_GENERATE_DICTIONARY(G__GETFormat
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETBasicFrame.hh
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETBasicFrameHeader.hh
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETCoboFrame.hh
@@ -38,29 +36,21 @@ ${CMAKE_SOURCE_DIR}/source/GETFormat/GETLayerHeader.hh
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETLayeredFrame.hh
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETTopologyFrame.hh
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETMutantFrame.hh
-LINKDEF ${CMAKE_SOURCE_DIR}/source/GETFormat/libGETFormatLinkDef.h)
 
-ROOT_GENERATE_DICTIONARY(G__GETUtil
 ${CMAKE_SOURCE_DIR}/source/GETUtil/GETFileChecker.hh
 ${CMAKE_SOURCE_DIR}/source/GETUtil/GETMath.hh
-LINKDEF ${CMAKE_SOURCE_DIR}/source/GETUtil/libGETUtilLinkDef.h)
 
-ROOT_GENERATE_DICTIONARY(G__GETCore
 ${CMAKE_SOURCE_DIR}/source/GETCore/GETDecoder.hh
 ${CMAKE_SOURCE_DIR}/source/GETCore/GETFrameInfo.hh
-LINKDEF ${CMAKE_SOURCE_DIR}/source/GETCore/libGETCoreLinkDef.h)
+LINKDEF ${CMAKE_SOURCE_DIR}/source/libGETDecoderLinkDef.h)
 
 #---Create a shared library with geneated dictionary
-add_library(FRIBDAQFormat SHARED
+add_library(GETDecoder SHARED 
 ${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingItemHeader.cc
 ${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingItemBodyHeader.cc
 ${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingStateChangeItem.cc
 ${CMAKE_SOURCE_DIR}/source/FRIBDAQFormat/RingPhysicsEventItem.cc
-G__FRIBDAQFormat.cxx
-)
-target_link_libraries(FRIBDAQFormat ${ROOT_LIBRARIES})
 
-add_library(GETFormat SHARED
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETBasicFrame.cc
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETBasicFrameHeader.cc
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETCoboFrame.cc
@@ -69,20 +59,12 @@ ${CMAKE_SOURCE_DIR}/source/GETFormat/GETLayerHeader.cc
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETLayeredFrame.cc
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETTopologyFrame.cc
 ${CMAKE_SOURCE_DIR}/source/GETFormat/GETMutantFrame.cc
-G__GETFormat.cxx
-)
-target_link_libraries(GETFormat ${ROOT_LIBRARIES})
-
-add_library(GETUtil SHARED
+                             
 ${CMAKE_SOURCE_DIR}/source/GETUtil/GETFileChecker.cc
 ${CMAKE_SOURCE_DIR}/source/GETUtil/GETMath.cc
-G__GETUtil.cxx
-)
-target_link_libraries(GETUtil ${ROOT_LIBRARIES})
-
-add_library(GETCore SHARED
+                            
 ${CMAKE_SOURCE_DIR}/source/GETCore/GETDecoder.cc
 ${CMAKE_SOURCE_DIR}/source/GETCore/GETFrameInfo.cc
-G__GETCore.cxx
+G__GETDecoder.cxx
 )
-target_link_libraries(GETCore ${ROOT_LIBRARIES})
+target_link_libraries(GETDecoder ${ROOT_LIBRARIES})
