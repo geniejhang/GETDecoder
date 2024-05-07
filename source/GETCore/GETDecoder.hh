@@ -106,7 +106,7 @@ class GETDecoder
     void LoadMetaData(TString filename); 
 
     //! Set topology frame information manually
-    void SetPseudoTopologyFrame(Int_t asadMask, Bool_t check = kFALSE);
+    void SetPseudoTopologyFrame(Int_t asadMask = 0xf, Bool_t check = kFALSE);
 
   private:
     //! Initialize variables used in the class.
@@ -131,6 +131,7 @@ class GETDecoder
       GETMutantFrame *fMutantFrame;
 
           RingItemHeader *fRingItemHeader;
+      RingItemBodyHeader *fRingItemBodyHeader;
 
      RingStateChangeItem *fRingStateChangeItem;
     RingPhysicsEventItem *fRingPhysicsEventItem;
@@ -151,6 +152,7 @@ class GETDecoder
     Bool_t fIsPositivePolarity;     ///< Flag for the signal polarity
     Bool_t fIsContinuousData;       ///< Flag for continuous data set
     Bool_t fIsMetaData;             ///< Flag for checking meta data
+    Bool_t fIsFRIBDataEnded;        ///< Flag for checking the datastream reached end state change item
 
     std::ifstream fData;            ///< Current file data stream
     ULong64_t fDataSize;            ///< Current file size
