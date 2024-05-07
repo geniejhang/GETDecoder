@@ -33,7 +33,7 @@
 
 #include "GETFileChecker.hh"
 
-#define DEBUG
+//#define DEBUG
 
 ClassImp(GETDecoder);
 
